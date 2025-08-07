@@ -1,13 +1,23 @@
 # ZHONG
 
-A minimalist web app that combines a Pomodoro-style timer with a private daily journal. All data stays in your browser.
+A minimalist, Pokémon-themed web app that combines a Pomodoro-style timer with a private daily journal. All data stays in your browser.
 
 ## Features
 
-- 25‑minute focus timer with start, pause, and reset controls
+- Adjustable focus timer with default 25‑minute sessions and 5‑minute breaks
 - Journal entries saved by date in `localStorage`
 - Expand entries to read or edit
-- Calming, responsive layout using the Inter font
+- Attach images or videos to journal entries
+- Preview selected media before saving entries
+- See existing attachments when editing entries
+- Delete entries or edit them later
+- Confetti celebration when the timer completes
+- Capture a random Pokémon in your Pokédex at the end of each session
+- Calming, responsive layout with playful Pokémon styling and subtle animations
+- Spinning, bouncing Pokéball and scrolling Pokéball background for extra flair
+- A running Pikachu sprite dashes across the page
+- Smoothly animated circular countdown with progress ring
+- Offline-ready via simple service worker caching
 
 ## Usage
 
