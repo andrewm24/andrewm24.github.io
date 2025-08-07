@@ -21,13 +21,18 @@ const workInput = document.getElementById('work-duration');
 const breakInput = document.getElementById('break-duration');
 const totalFocusEl = document.getElementById('total-focus');
 const sessionCountEl = document.getElementById('session-count');
+const xpEl = document.getElementById('xp');
+
+const XP_THRESHOLD = 30; // minutes required to catch a new Pokémon
 
 let totalFocus = parseInt(localStorage.getItem('total-focus'), 10) || 0;
 let sessionCount = parseInt(localStorage.getItem('session-count'), 10) || 0;
+let xp = parseInt(localStorage.getItem('xp'), 10) || 0;
 
 function renderStats() {
   if (totalFocusEl) totalFocusEl.textContent = totalFocus;
   if (sessionCountEl) sessionCountEl.textContent = sessionCount;
+  if (xpEl) xpEl.textContent = xp;
 }
 
 function populateDropdown(select, defaultValue) {
@@ -85,11 +90,18 @@ function frame(timestamp) {
     timeEl.classList.add('complete');
     if (!isBreak) {
       trainActivePokemon();
-      capturePokemon();
-      totalFocus += workDuration / 60;
+      const gained = workDuration / 60;
+      xp += gained;
+      totalFocus += gained;
       sessionCount += 1;
+      localStorage.setItem('xp', xp);
       localStorage.setItem('total-focus', totalFocus);
       localStorage.setItem('session-count', sessionCount);
+      while (xp >= XP_THRESHOLD) {
+        capturePokemon();
+        xp -= XP_THRESHOLD;
+        localStorage.setItem('xp', xp);
+      }
       renderStats();
       launchConfetti();
       isBreak = true;
