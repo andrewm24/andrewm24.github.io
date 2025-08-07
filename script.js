@@ -384,6 +384,7 @@ function launchConfetti() {
 
 const runnerImg = document.getElementById('background-pokemon');
 const capturedEl = document.getElementById('captured');
+const starterModal = document.getElementById('starter-modal');
 let captured = JSON.parse(localStorage.getItem('captured-pokemon') || '[]').map(p => ({
   id: p.id || null,
   name: p.name,
@@ -396,6 +397,17 @@ if (isNaN(activePokemonIndex)) activePokemonIndex = null;
 renderCaptured();
 updateRunner();
 
+if (captured.length === 0 && starterModal) {
+  starterModal.classList.remove('hidden');
+}
+
+starterModal?.addEventListener('click', e => {
+  const img = e.target.closest('img[data-id]');
+  if (!img) return;
+  const id = parseInt(img.dataset.id, 10);
+  chooseStarter(id);
+});
+
 capturedEl.addEventListener('click', e => {
   const img = e.target.closest('img');
   if (!img) return;
@@ -403,6 +415,24 @@ capturedEl.addEventListener('click', e => {
   if (isNaN(index)) return;
   setActivePokemon(index);
 });
+
+function chooseStarter(id) {
+  const starters = {
+    1: { name: 'bulbasaur', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png' },
+    4: { name: 'charmander', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png' },
+    7: { name: 'squirtle', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png' }
+  };
+  const base = starters[id];
+  if (!base) return;
+  const pokemon = { id, name: base.name, sprite: base.sprite, xp: 0, level: 1 };
+  captured.push(pokemon);
+  activePokemonIndex = captured.length - 1;
+  localStorage.setItem('captured-pokemon', JSON.stringify(captured));
+  localStorage.setItem('active-pokemon-index', activePokemonIndex);
+  renderCaptured();
+  updateRunner();
+  starterModal?.classList.add('hidden');
+}
 
 async function capturePokemon() {
   try {
