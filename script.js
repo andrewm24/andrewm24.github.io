@@ -50,6 +50,7 @@ updateDisplay();
 // Journal logic
 const entryDate = document.getElementById('entry-date');
 const entryText = document.getElementById('entry-text');
+const entryMedia = document.getElementById('entry-media');
 const saveEntry = document.getElementById('save-entry');
 const entriesEl = document.getElementById('entries');
 
@@ -62,11 +63,40 @@ entryDate.value = today();
 saveEntry.addEventListener('click', () => {
   const date = entryDate.value;
   const text = entryText.value.trim();
-  if (!date || !text) return;
-  localStorage.setItem('journal-' + date, text);
-  entryText.value = '';
-  renderEntries();
+  const file = entryMedia.files[0];
+  if (!date || (!text && !file)) return;
+
+  const existing = localStorage.getItem('journal-' + date);
+  let existingMedia;
+  let existingType;
+  if (existing) {
+    try {
+      const parsed = JSON.parse(existing);
+      existingMedia = parsed.media;
+      existingType = parsed.mediaType;
+    } catch (e) {}
+  }
+
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const entryObj = { text, media: reader.result, mediaType: file.type };
+      localStorage.setItem('journal-' + date, JSON.stringify(entryObj));
+      afterSave();
+    };
+    reader.readAsDataURL(file);
+  } else {
+    const entryObj = { text, media: existingMedia, mediaType: existingType };
+    localStorage.setItem('journal-' + date, JSON.stringify(entryObj));
+    afterSave();
+  }
 });
+
+function afterSave() {
+  entryText.value = '';
+  entryMedia.value = '';
+  renderEntries();
+}
 
 function renderEntries() {
   entriesEl.innerHTML = '';
@@ -76,7 +106,17 @@ function renderEntries() {
     .reverse();
   keys.forEach(key => {
     const date = key.replace('journal-', '');
-    const text = localStorage.getItem(key) || '';
+    const raw = localStorage.getItem(key) || '';
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch (e) {
+      data = { text: raw };
+    }
+    const text = data.text || '';
+    const media = data.media;
+    const mediaType = data.mediaType;
+
     const entry = document.createElement('div');
     entry.className = 'entry';
     entry.dataset.date = date;
@@ -87,13 +127,30 @@ function renderEntries() {
 
     const preview = document.createElement('p');
     preview.className = 'preview';
-    preview.textContent = text.slice(0, 100) + (text.length > 100 ? '…' : '');
+    preview.textContent = text
+      ? text.slice(0, 100) + (text.length > 100 ? '…' : '')
+      : '[Media]';
     entry.appendChild(preview);
 
     const full = document.createElement('p');
     full.className = 'full';
     full.textContent = text;
     entry.appendChild(full);
+
+    if (media) {
+      const mediaWrap = document.createElement('div');
+      mediaWrap.className = 'media';
+      let mediaEl;
+      if (mediaType && mediaType.startsWith('video')) {
+        mediaEl = document.createElement('video');
+        mediaEl.controls = true;
+      } else {
+        mediaEl = document.createElement('img');
+      }
+      mediaEl.src = media;
+      mediaWrap.appendChild(mediaEl);
+      entry.appendChild(mediaWrap);
+    }
 
     const edit = document.createElement('button');
     edit.textContent = 'Edit';
@@ -110,7 +167,14 @@ entriesEl.addEventListener('click', e => {
 
   if (e.target.classList.contains('edit')) {
     entryDate.value = entry.dataset.date;
-    entryText.value = localStorage.getItem('journal-' + entry.dataset.date) || '';
+    const raw = localStorage.getItem('journal-' + entry.dataset.date) || '';
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch (err) {
+      data = { text: raw };
+    }
+    entryText.value = data.text || '';
     entryText.focus();
   } else {
     entry.classList.toggle('expanded');
