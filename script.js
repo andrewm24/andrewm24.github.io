@@ -40,6 +40,7 @@ function frame(timestamp) {
   } else {
     paused = true;
     timeEl.classList.add('complete');
+    launchConfetti();
   }
 }
 
@@ -74,6 +75,7 @@ const entryMedia = document.getElementById('entry-media');
 const saveEntry = document.getElementById('save-entry');
 const entriesEl = document.getElementById('entries');
 const mediaPreview = document.getElementById('media-preview');
+const errorEl = document.getElementById('error');
 
 function today() {
   return new Date().toISOString().split('T')[0];
@@ -85,21 +87,29 @@ saveEntry.addEventListener('click', async () => {
   const date = entryDate.value;
   const text = entryText.value.trim();
   const file = entryMedia.files[0];
+  errorEl.textContent = '';
   if (!date || (!text && !file)) return;
 
   let media, mediaType;
-  if (file) {
-    media = await readFileAsDataURL(file);
-    mediaType = file.type;
-  } else {
-    const existing = JSON.parse(localStorage.getItem('journal-' + date) || '{}');
-    media = existing.media;
-    mediaType = existing.mediaType;
-  }
+  try {
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error('File too large');
+      }
+      media = await readFileAsDataURL(file);
+      mediaType = file.type;
+    } else {
+      const existing = JSON.parse(localStorage.getItem('journal-' + date) || '{}');
+      media = existing.media;
+      mediaType = existing.mediaType;
+    }
 
-  const entryObj = { text, media, mediaType };
-  localStorage.setItem('journal-' + date, JSON.stringify(entryObj));
-  afterSave(date);
+    const entryObj = { text, media, mediaType };
+    localStorage.setItem('journal-' + date, JSON.stringify(entryObj));
+    afterSave(date);
+  } catch (err) {
+    errorEl.textContent = 'Could not save media: ' + err.message;
+  }
 });
 
 entryMedia.addEventListener('change', () => {
@@ -199,10 +209,17 @@ function renderEntries() {
       entry.appendChild(mediaWrap);
     }
 
+    const actions = document.createElement('div');
+    actions.className = 'actions';
     const edit = document.createElement('button');
     edit.textContent = 'Edit';
     edit.className = 'edit';
-    entry.appendChild(edit);
+    const del = document.createElement('button');
+    del.textContent = 'Delete';
+    del.className = 'delete';
+    actions.appendChild(edit);
+    actions.appendChild(del);
+    entry.appendChild(actions);
 
     entriesEl.appendChild(entry);
   });
@@ -223,6 +240,9 @@ entriesEl.addEventListener('click', e => {
     }
     entryText.value = data.text || '';
     entryText.focus();
+  } else if (e.target.classList.contains('delete')) {
+    localStorage.removeItem('journal-' + entry.dataset.date);
+    entry.remove();
   } else {
     entry.classList.toggle('expanded');
   }
@@ -234,3 +254,18 @@ function formatDate(str) {
 }
 
 renderEntries();
+
+function launchConfetti() {
+  for (let i = 0; i < 20; i++) {
+    const div = document.createElement('div');
+    div.className = 'confetti';
+    div.style.left = Math.random() * 100 + 'vw';
+    div.style.background = `hsl(${Math.random() * 360},100%,50%)`;
+    document.body.appendChild(div);
+    setTimeout(() => div.remove(), 3000);
+  }
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}

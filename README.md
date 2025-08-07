@@ -9,9 +9,12 @@ A minimalist, Pokémon-themed web app that combines a Pomodoro-style timer with 
 - Expand entries to read or edit
 - Attach images or videos to journal entries
 - Preview selected media before saving entries
+- Delete entries or edit them later
+- Confetti celebration when the timer completes
 - Calming, responsive layout with playful Pokémon styling and subtle animations
 - Spinning, bouncing Pokéball and scrolling Pokéball background for extra flair
 - Smoothly animated circular countdown with progress ring
+- Offline-ready via simple service worker caching
 
 ## Usage
 
