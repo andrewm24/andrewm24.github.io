@@ -3,37 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="ZHONG blends a Pomodoro timer with a private daily journal for focused productivity."
+  />
   <title>ZHONG</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="zhong">
   <header>
     <h1>ZHONG</h1>
     <p class="tagline">Focus & Reflect</p>
   </header>
 
   <main>
-    <section id="timer">
+    <section id="zhong-timer">
       <h2>Pomodoro Timer</h2>
-      <div id="time">25:00</div>
-      <div class="controls">
-        <button id="start">Start</button>
-        <button id="pause">Pause</button>
-        <button id="reset">Reset</button>
+      <div id="zhong-time">25:00</div>
+      <div class="zhong-controls">
+        <button id="zhong-start">Start</button>
+        <button id="zhong-pause">Pause</button>
+        <button id="zhong-reset">Reset</button>
       </div>
     </section>
 
-    <section id="journal">
+    <section id="zhong-journal">
       <h2>Daily Journal</h2>
-      <div class="journal-input">
-        <input type="date" id="entry-date" />
-        <textarea id="entry-text" placeholder="Write your reflection..."></textarea>
-        <button id="save-entry">Save Entry</button>
+      <div class="zhong-journal-input">
+        <input type="date" id="zhong-entry-date" />
+        <textarea id="zhong-entry-text" placeholder="Write your reflection..."></textarea>
+        <button id="zhong-save-entry">Save Entry</button>
       </div>
-      <div id="entries"></div>
+      <div id="zhong-entries"></div>
     </section>
   </main>
 

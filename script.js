@@ -3,10 +3,10 @@ const duration = 25 * 60; // 25 minutes
 let remaining = duration;
 let timerId = null;
 
-const timeEl = document.getElementById('time');
-const startBtn = document.getElementById('start');
-const pauseBtn = document.getElementById('pause');
-const resetBtn = document.getElementById('reset');
+const timeEl = document.getElementById('zhong-time');
+const startBtn = document.getElementById('zhong-start');
+const pauseBtn = document.getElementById('zhong-pause');
+const resetBtn = document.getElementById('zhong-reset');
 
 function updateDisplay() {
   const mins = String(Math.floor(remaining / 60)).padStart(2, '0');
@@ -48,10 +48,10 @@ resetBtn.addEventListener('click', () => {
 updateDisplay();
 
 // Journal logic
-const entryDate = document.getElementById('entry-date');
-const entryText = document.getElementById('entry-text');
-const saveEntry = document.getElementById('save-entry');
-const entriesEl = document.getElementById('entries');
+const entryDate = document.getElementById('zhong-entry-date');
+const entryText = document.getElementById('zhong-entry-text');
+const saveEntry = document.getElementById('zhong-save-entry');
+const entriesEl = document.getElementById('zhong-entries');
 
 function today() {
   return new Date().toISOString().split('T')[0];

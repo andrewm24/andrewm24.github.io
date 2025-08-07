@@ -1,138 +1,176 @@
-:root {
-  --bg: #f5f7fa;
+.zhong {
+  --bg-start: #f5f7fa;
+  --bg-end: #e1e8f0;
   --text: #374151;
-  --accent: #7aa2d2;
+  --accent: #6366f1;
+  --accent-hover: #4f46e5;
   --card: #ffffff;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-body {
+  --border: #e5e7eb;
   margin: 0;
   font-family: 'Inter', sans-serif;
-  background: var(--bg);
+  background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
   color: var(--text);
+  line-height: 1.6;
   display: flex;
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
+  padding: 0 1rem;
 }
 
-header {
+.zhong *, .zhong *::before, .zhong *::after {
+  box-sizing: border-box;
+}
+
+.zhong header {
   text-align: center;
   margin-top: 2rem;
 }
 
-.tagline {
+.zhong .tagline {
   margin-top: 0.25rem;
   color: #6b7280;
 }
 
-main {
-  width: 90%;
-  max-width: 600px;
+.zhong main {
+  width: 100%;
+  max-width: 650px;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  padding: 2rem 0;
+  gap: 2.5rem;
+  padding: 2.5rem 0;
 }
 
-section {
+.zhong section {
   background: var(--card);
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 1.75rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s;
 }
 
-#timer #time {
-  font-size: 3rem;
+.zhong section:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+}
+
+.zhong #zhong-timer #zhong-time {
+  font-size: 3.5rem;
   text-align: center;
   margin: 1rem 0;
+  font-variant-numeric: tabular-nums;
 }
 
-.controls {
+.zhong .zhong-controls {
   display: flex;
   justify-content: center;
   gap: 0.5rem;
 }
 
-button {
+.zhong button {
   background: var(--accent);
   color: #fff;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+  padding: 0.5rem 1.25rem;
+  border-radius: 6px;
   cursor: pointer;
-  transition: opacity 0.2s;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background 0.2s, transform 0.1s;
 }
 
-button:hover {
-  opacity: 0.85;
+.zhong button:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
 }
 
-button:disabled {
+.zhong button:active {
+  transform: translateY(0);
+}
+
+.zhong button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
-.journal-input {
+.zhong .zhong-journal-input {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
-textarea {
-  resize: vertical;
-  min-height: 100px;
+.zhong input[type="date"],
+.zhong textarea {
+  border: 1px solid var(--border);
+  border-radius: 6px;
   padding: 0.5rem;
   font-size: 1rem;
 }
 
-#entries .entry {
-  padding: 1rem 0;
-  border-bottom: 1px solid #e5e7eb;
-  cursor: pointer;
-  opacity: 0;
-  animation: fadeIn 0.3s forwards;
+.zhong textarea {
+  resize: vertical;
+  min-height: 100px;
 }
 
-#entries .entry:last-child {
+.zhong input[type="date"]:focus,
+.zhong textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.zhong #zhong-entries .entry {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  opacity: 0;
+  animation: zhong-fadeIn 0.3s forwards;
+  transition: background-color 0.2s;
+}
+
+.zhong #zhong-entries .entry:hover {
+  background: #f9fafb;
+}
+
+.zhong #zhong-entries .entry:last-child {
   border-bottom: none;
 }
 
-#entries .entry h3 {
+.zhong #zhong-entries .entry h3 {
   margin: 0 0 0.25rem;
 }
 
-#entries .entry .preview {
+.zhong #zhong-entries .entry .preview {
   color: #6b7280;
 }
 
-#entries .entry .full {
+.zhong #zhong-entries .entry .full {
   display: none;
   margin-top: 0.5rem;
 }
 
-#entries .entry.expanded .full {
+.zhong #zhong-entries .entry.expanded .full {
   display: block;
 }
 
-#entries .entry button.edit {
+.zhong #zhong-entries .entry button.edit {
   margin-top: 0.5rem;
   background: transparent;
   color: var(--accent);
   padding: 0;
+  border: none;
+  font-size: 0.875rem;
 }
 
-@keyframes fadeIn {
+@keyframes zhong-fadeIn {
   to {
     opacity: 1;
   }
 }
 
-@keyframes pulse {
+@keyframes zhong-pulse {
   0% {
     transform: scale(1);
   }
@@ -144,7 +182,8 @@ textarea {
   }
 }
 
-#time.complete {
+.zhong #zhong-time.complete {
   color: var(--accent);
-  animation: pulse 1s ease-in-out 2;
+  animation: zhong-pulse 1s ease-in-out 2;
 }
+
