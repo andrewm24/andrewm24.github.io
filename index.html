@@ -17,22 +17,24 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <div class="pokeball-wrapper">
-      <div class="pokeball" aria-hidden="true"></div>
-    </div>
-    <h1>PokéJournal</h1>
-    <p class="tagline">Catch your thoughts &amp; train your focus</p>
-  </header>
-  <img
-    id="background-pokemon"
-    src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png"
-    class="runner"
-    alt=""
-    aria-hidden="true"
-  />
+  <div class="pokedex">
+    <div class="screen">
+      <header>
+        <div class="pokeball-wrapper">
+          <div class="pokeball" aria-hidden="true"></div>
+        </div>
+        <h1>PokéJournal</h1>
+        <p class="tagline">Catch your thoughts &amp; train your focus</p>
+      </header>
+      <img
+        id="background-pokemon"
+        src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png"
+        class="runner"
+        alt=""
+        aria-hidden="true"
+      />
 
-  <main>
+      <main>
     <section id="timer">
       <h2>Pomodoro Timer</h2>
       <div id="time-wrapper">
@@ -78,7 +80,9 @@
       </div>
       <div id="entries"></div>
     </section>
-  </main>
+      </main>
+    </div>
+  </div>
   <script src="script.js"></script>
 </body>
 </html>
