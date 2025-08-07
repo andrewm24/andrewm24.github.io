@@ -20,6 +20,21 @@ const resetBtn = document.getElementById('reset');
 const workInput = document.getElementById('work-duration');
 const breakInput = document.getElementById('break-duration');
 
+// Load saved durations or fall back to defaults
+const savedWork = parseInt(localStorage.getItem('work-duration'), 10);
+const savedBreak = parseInt(localStorage.getItem('break-duration'), 10);
+if (!isNaN(savedWork)) {
+  workDuration = savedWork * 60;
+  workInput.value = savedWork;
+}
+if (!isNaN(savedBreak)) {
+  breakDuration = savedBreak * 60;
+  breakInput.value = savedBreak;
+}
+duration = workDuration;
+remaining = duration;
+totalMs = duration * 1000;
+
 function updateDisplay(secRemaining) {
   const mins = String(Math.floor(secRemaining / 60)).padStart(2, '0');
   const secs = String(secRemaining % 60).padStart(2, '0');
@@ -45,9 +60,9 @@ function frame(timestamp) {
   } else {
     paused = true;
     timeEl.classList.add('complete');
+    capturePokemon();
     if (!isBreak) {
       launchConfetti();
-      capturePokemon();
       isBreak = true;
       duration = breakDuration;
       remaining = duration;
@@ -98,6 +113,8 @@ resetBtn.addEventListener('click', () => {
 function applyDurations() {
   workDuration = Math.max(parseInt(workInput.value, 10) || 1, 1) * 60;
   breakDuration = Math.max(parseInt(breakInput.value, 10) || 1, 1) * 60;
+  localStorage.setItem('work-duration', workInput.value);
+  localStorage.setItem('break-duration', breakInput.value);
   if (!isBreak) {
     duration = workDuration;
   } else {
