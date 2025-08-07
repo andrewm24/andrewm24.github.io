@@ -58,37 +58,6 @@ duration = workDuration;
 remaining = duration;
 totalMs = duration * 1000;
 
-xe5vmk-codex/add-adjustable-timer-for-pokemon-capture
-function populateDropdown(select, defaultValue) {
-  for (let i = 1; i <= 60; i++) {
-    const option = document.createElement('option');
-    option.value = i;
-    option.textContent = i;
-    select.appendChild(option);
-  }
-  select.value = defaultValue;
-}
-
-populateDropdown(workInput, 25);
-populateDropdown(breakInput, 5);
-
-
-main
-// Load saved durations or fall back to defaults
-const savedWork = parseInt(localStorage.getItem('work-duration'), 10);
-const savedBreak = parseInt(localStorage.getItem('break-duration'), 10);
-if (!isNaN(savedWork)) {
-  workDuration = savedWork * 60;
-  workInput.value = savedWork;
-}
-if (!isNaN(savedBreak)) {
-  breakDuration = savedBreak * 60;
-  breakInput.value = savedBreak;
-}
-duration = workDuration;
-remaining = duration;
-totalMs = duration * 1000;
-
 function updateDisplay(secRemaining) {
   const mins = String(Math.floor(secRemaining / 60)).padStart(2, '0');
   const secs = String(secRemaining % 60).padStart(2, '0');
@@ -114,8 +83,9 @@ function frame(timestamp) {
   } else {
     paused = true;
     timeEl.classList.add('complete');
-    capturePokemon();
     if (!isBreak) {
+      trainActivePokemon();
+      capturePokemon();
       totalFocus += workDuration / 60;
       sessionCount += 1;
       localStorage.setItem('total-focus', totalFocus);
@@ -412,20 +382,54 @@ function launchConfetti() {
   }
 }
 
+const runnerImg = document.getElementById('background-pokemon');
 const capturedEl = document.getElementById('captured');
-let captured = JSON.parse(localStorage.getItem('captured-pokemon') || '[]');
+let captured = JSON.parse(localStorage.getItem('captured-pokemon') || '[]').map(p => ({
+  id: p.id || null,
+  name: p.name,
+  sprite: p.sprite,
+  xp: p.xp || 0,
+  level: p.level || 1
+}));
+let activePokemonIndex = parseInt(localStorage.getItem('active-pokemon-index'), 10);
+if (isNaN(activePokemonIndex)) activePokemonIndex = null;
 renderCaptured();
+updateRunner();
+
+capturedEl.addEventListener('click', e => {
+  const img = e.target.closest('img');
+  if (!img) return;
+  const index = parseInt(img.dataset.index, 10);
+  if (isNaN(index)) return;
+  setActivePokemon(index);
+});
 
 async function capturePokemon() {
   try {
-    const id = Math.floor(Math.random() * 151) + 1;
-    const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
-    const data = await res.json();
-    const pokemon = { name: data.name, sprite: data.sprites.front_default };
+    let data, species;
+    do {
+      const id = Math.floor(Math.random() * 151) + 1;
+      const speciesRes = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${id}`);
+      species = await speciesRes.json();
+      if (species.evolves_from_species) continue;
+      const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+      data = await res.json();
+      break;
+    } while (true);
+    const pokemon = {
+      id: data.id,
+      name: data.name,
+      sprite: data.sprites.front_default,
+      xp: 0,
+      level: 1
+    };
     captured.push(pokemon);
     localStorage.setItem('captured-pokemon', JSON.stringify(captured));
     renderCaptured();
-    showCaptureToast(pokemon.name);
+    showToast(`You caught ${pokemon.name}!`);
+    if (activePokemonIndex === null) {
+      setActivePokemon(captured.length - 1);
+    }
     if ('Notification' in window && Notification.permission === 'granted') {
       new Notification(`You caught ${pokemon.name}!`);
     }
@@ -434,10 +438,21 @@ async function capturePokemon() {
   }
 }
 
-function showCaptureToast(name) {
+function trainActivePokemon() {
+  if (activePokemonIndex === null) return;
+  const p = captured[activePokemonIndex];
+  if (!p) return;
+  p.xp += 10;
+  p.level = Math.floor(p.xp / 100) + 1;
+  localStorage.setItem('captured-pokemon', JSON.stringify(captured));
+  renderCaptured();
+  showToast(`${p.name} gained 10 XP!`);
+}
+
+function showToast(message) {
   const div = document.createElement('div');
   div.className = 'capture-toast';
-  div.textContent = `You caught ${name}!`;
+  div.textContent = message;
   document.body.appendChild(div);
   setTimeout(() => div.remove(), 3000);
 }
@@ -445,13 +460,35 @@ function showCaptureToast(name) {
 function renderCaptured() {
   if (!capturedEl) return;
   capturedEl.innerHTML = '';
-  captured.forEach(p => {
+  captured.forEach((p, index) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'pokemon';
+    if (index === activePokemonIndex) wrapper.classList.add('active');
     const img = document.createElement('img');
     img.src = p.sprite;
     img.alt = p.name;
     img.title = p.name;
-    capturedEl.appendChild(img);
+    img.dataset.index = index;
+    const level = document.createElement('span');
+    level.className = 'level';
+    level.textContent = 'Lv. ' + p.level;
+    wrapper.appendChild(img);
+    wrapper.appendChild(level);
+    capturedEl.appendChild(wrapper);
   });
+}
+
+function setActivePokemon(index) {
+  activePokemonIndex = index;
+  localStorage.setItem('active-pokemon-index', index);
+  updateRunner();
+  renderCaptured();
+}
+
+function updateRunner() {
+  if (!runnerImg) return;
+  const p = captured[activePokemonIndex];
+  runnerImg.src = p ? p.sprite : 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png';
 }
 
 if ('serviceWorker' in navigator) {
