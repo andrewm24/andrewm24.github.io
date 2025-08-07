@@ -7,7 +7,9 @@ A minimalist web app that combines a Pomodoro-style timer with a private daily j
 - 25‑minute focus timer with start, pause, and reset controls
 - Journal entries saved by date in `localStorage`
 - Expand entries to read or edit
-- Calming, responsive layout using the Inter font
+- Attach images or videos to journal entries
+- Calming, responsive layout with subtle animations using the Inter font
+- Animated circular countdown with progress ring
 
 ## Usage
 
