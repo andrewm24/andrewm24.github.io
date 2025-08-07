@@ -17,22 +17,24 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <div class="pokeball-wrapper">
-      <div class="pokeball" aria-hidden="true"></div>
-    </div>
-    <h1>PokéJournal</h1>
-    <p class="tagline">Catch your thoughts &amp; train your focus</p>
-  </header>
-  <img
-    id="background-pokemon"
-    src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png"
-    class="runner"
-    alt=""
-    aria-hidden="true"
-  />
+  <div class="pokedex">
+    <div class="screen">
+      <header>
+        <div class="pokeball-wrapper">
+          <div class="pokeball" aria-hidden="true"></div>
+        </div>
+        <h1>PokéJournal</h1>
+        <p class="tagline">Catch your thoughts &amp; train your focus</p>
+      </header>
+      <img
+        id="background-pokemon"
+        src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png"
+        class="runner"
+        alt=""
+        aria-hidden="true"
+      />
 
-  <main>
+      <main>
     <section id="timer">
       <h2>Pomodoro Timer</h2>
       <div id="time-wrapper">
@@ -75,10 +77,22 @@
         <div id="media-preview" class="media-preview" aria-hidden="true"></div>
         <p id="error" class="error" aria-live="polite"></p>
         <button id="save-entry">Save Entry</button>
-      </div>
-      <div id="entries"></div>
+  </div>
+  <div id="entries"></div>
     </section>
-  </main>
+      </main>
+    </div>
+  </div>
+  <div id="starter-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Choose your starter!</h2>
+      <div class="starters">
+        <img data-id="1" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png" alt="Bulbasaur" />
+        <img data-id="4" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png" alt="Charmander" />
+        <img data-id="7" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png" alt="Squirtle" />
+      </div>
+    </div>
+  </div>
   <script src="script.js"></script>
 </body>
 </html>
