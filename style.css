@@ -319,11 +319,25 @@ textarea:focus {
   max-height: 1000px;
 }
 
+=======
+}
+
+#entries .entry.expanded .full,
+#entries .entry.expanded .media {
+  max-height: 1000px;
+}
+
 #entries .entry .media img,
 #entries .entry .media video {
   display: block;
   max-width: 100%;
   border-radius: 8px;
+}
+
+#entries .entry .media video {
+  max-height: 400px;
+}
+
 }
 
 #entries .entry .media video {
@@ -471,7 +485,7 @@ textarea:focus {
   100% {
     transform: translateX(calc(100vw + 60px));
   }
-=======
+
 body {
   font-family: Arial, sans-serif;
   margin: 0;

@@ -368,7 +368,7 @@ function renderCaptured() {
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js');
 }
-=======
+
 function sha256(message) {
   const msgBuffer = new TextEncoder().encode(message);
   return crypto.subtle.digest('SHA-256', msgBuffer).then(hashBuffer => {
