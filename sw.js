@@ -10,11 +10,27 @@ self.addEventListener('install', evt => {
   evt.waitUntil(
     caches.open(CACHE).then(cache => cache.addAll(ASSETS))
   );
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', evt => {
+  evt.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+    )
+  );
+  self.clients.claim();
 });
 
 self.addEventListener('fetch', evt => {
   evt.respondWith(
-    caches.match(evt.request).then(resp => resp || fetch(evt.request))
+    fetch(evt.request)
+      .then(resp => {
+        const clone = resp.clone();
+        caches.open(CACHE).then(cache => cache.put(evt.request, clone));
+        return resp;
+      })
+      .catch(() => caches.match(evt.request))
   );
 });
 
