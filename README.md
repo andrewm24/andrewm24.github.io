@@ -4,7 +4,7 @@ A minimalist, Pokémon-themed web app that combines a Pomodoro-style timer with 
 
 ## Features
 
-- Adjustable focus timer with default 25‑minute sessions and 5‑minute breaks
+- Adjustable focus timer with work/break lengths selectable from dropdown and saved between sessions
 - Journal entries saved by date in `localStorage`
 - Expand entries to read or edit
 - Attach images or videos to journal entries
@@ -12,7 +12,7 @@ A minimalist, Pokémon-themed web app that combines a Pomodoro-style timer with 
 - See existing attachments when editing entries
 - Delete entries or edit them later
 - Confetti celebration when the timer completes
-- Capture a random Pokémon in your Pokédex at the end of each session
+- Capture a random Pokémon in your Pokédex every time the timer finishes
 - Calming, responsive layout with playful Pokémon styling and subtle animations
 - Spinning, bouncing Pokéball and scrolling Pokéball background for extra flair
 - A running Pikachu sprite dashes across the page
