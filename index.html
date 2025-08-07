@@ -22,7 +22,13 @@
   <main>
     <section id="timer">
       <h2>Pomodoro Timer</h2>
-      <div id="time">25:00</div>
+      <div id="time-wrapper">
+        <svg id="progress" viewBox="0 0 100 100">
+          <circle class="bg" cx="50" cy="50" r="45"></circle>
+          <circle class="bar" cx="50" cy="50" r="45"></circle>
+        </svg>
+        <div id="time">25:00</div>
+      </div>
       <div class="controls">
         <button id="start">Start</button>
         <button id="pause">Pause</button>
@@ -35,6 +41,7 @@
       <div class="journal-input">
         <input type="date" id="entry-date" />
         <textarea id="entry-text" placeholder="Write your reflection..."></textarea>
+        <input type="file" id="entry-media" accept="image/*,video/*" />
         <button id="save-entry">Save Entry</button>
       </div>
       <div id="entries"></div>
