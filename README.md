@@ -4,7 +4,10 @@ A minimalist, Pokémon-themed web app that combines a Pomodoro-style timer with 
 
 ## Features
 
+xe5vmk-codex/add-adjustable-timer-for-pokemon-capture
 - Adjustable focus timer with work/break lengths selectable from dropdown and saved between sessions
+- Adjustable focus timer with work/break lengths saved between sessions
+main
 - Journal entries saved by date in `localStorage`
 - Expand entries to read or edit
 - Attach images or videos to journal entries

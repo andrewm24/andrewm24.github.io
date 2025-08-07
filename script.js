@@ -20,6 +20,7 @@ const resetBtn = document.getElementById('reset');
 const workInput = document.getElementById('work-duration');
 const breakInput = document.getElementById('break-duration');
 
+xe5vmk-codex/add-adjustable-timer-for-pokemon-capture
 function populateDropdown(select, defaultValue) {
   for (let i = 1; i <= 60; i++) {
     const option = document.createElement('option');
@@ -33,6 +34,8 @@ function populateDropdown(select, defaultValue) {
 populateDropdown(workInput, 25);
 populateDropdown(breakInput, 5);
 
+
+main
 // Load saved durations or fall back to defaults
 const savedWork = parseInt(localStorage.getItem('work-duration'), 10);
 const savedBreak = parseInt(localStorage.getItem('break-duration'), 10);
