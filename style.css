@@ -28,6 +28,9 @@ body {
 header {
   text-align: center;
   margin-top: 2rem;
+  opacity: 0;
+  animation: fadeInUp 0.6s forwards;
+  animation-delay: 0.1s;
 }
 
 .tagline {
@@ -51,17 +54,58 @@ section {
   border: 1px solid var(--border);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   transition: box-shadow 0.2s;
+  opacity: 0;
+  animation: fadeInUp 0.6s forwards;
 }
 
 section:hover {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
 }
 
+main > section:nth-of-type(1) {
+  animation-delay: 0.2s;
+}
+
+main > section:nth-of-type(2) {
+  animation-delay: 0.4s;
+}
+
+#time-wrapper {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  margin: 1rem auto;
+}
+
 #timer #time {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   font-size: 3.5rem;
-  text-align: center;
-  margin: 1rem 0;
   font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+#progress {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+#progress circle {
+  fill: none;
+  stroke-width: 8;
+}
+
+#progress circle.bg {
+  stroke: var(--border);
+}
+
+#progress circle.bar {
+  stroke: var(--accent);
+  stroke-dasharray: 282.743px;
+  stroke-dashoffset: 0;
 }
 
 .controls {
@@ -117,6 +161,13 @@ textarea {
   min-height: 100px;
 }
 
+input[type="file"] {
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  padding: 0.75rem;
+  font-size: 1rem;
+}
+
 input[type="date"]:focus,
 textarea:focus {
   outline: none;
@@ -129,7 +180,7 @@ textarea:focus {
   border-bottom: 1px solid var(--border);
   cursor: pointer;
   opacity: 0;
-  animation: fadeIn 0.3s forwards;
+  animation: fadeInUp 0.3s forwards;
   transition: background-color 0.2s;
 }
 
@@ -149,13 +200,28 @@ textarea:focus {
   color: #6b7280;
 }
 
-#entries .entry .full {
-  display: none;
+#entries .entry .full,
+#entries .entry .media {
+  max-height: 0;
+  overflow: hidden;
   margin-top: 0.5rem;
+  transition: max-height 0.3s ease;
 }
 
-#entries .entry.expanded .full {
+#entries .entry.expanded .full,
+#entries .entry.expanded .media {
+  max-height: 1000px;
+}
+
+#entries .entry .media img,
+#entries .entry .media video {
   display: block;
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+#entries .entry .media video {
+  max-height: 400px;
 }
 
 #entries .entry button.edit {
@@ -173,19 +239,46 @@ textarea:focus {
   }
 }
 
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes pulse {
   0% {
-    transform: scale(1);
+    transform: translate(-50%, -50%) scale(1);
   }
   50% {
-    transform: scale(1.05);
+    transform: translate(-50%, -50%) scale(1.05);
   }
   100% {
-    transform: scale(1);
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes tick {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
   }
 }
 
 #time.complete {
   color: var(--accent);
   animation: pulse 1s ease-in-out 2;
+}
+
+#time.tick {
+  animation: tick 0.5s ease-in-out;
 }
