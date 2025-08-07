@@ -1,57 +1,81 @@
 // Timer logic
 const duration = 25 * 60; // 25 minutes
+const totalMs = duration * 1000;
 let remaining = duration;
-let timerId = null;
+let startTime;
+let rafId = null;
+let paused = true;
 
 const timeEl = document.getElementById('time');
+const progressBar = document.querySelector('#progress .bar');
+const circumference = 2 * Math.PI * 45;
+progressBar.style.strokeDasharray = `${circumference}px`;
+
 const startBtn = document.getElementById('start');
 const pauseBtn = document.getElementById('pause');
 const resetBtn = document.getElementById('reset');
 
-function updateDisplay() {
-  const mins = String(Math.floor(remaining / 60)).padStart(2, '0');
-  const secs = String(remaining % 60).padStart(2, '0');
+function updateDisplay(secRemaining) {
+  const mins = String(Math.floor(secRemaining / 60)).padStart(2, '0');
+  const secs = String(secRemaining % 60).padStart(2, '0');
   timeEl.textContent = `${mins}:${secs}`;
 }
 
-function tick() {
-  if (remaining > 0) {
-    remaining--;
-    updateDisplay();
-    if (remaining === 0) {
-      timeEl.classList.add('complete');
-    }
+function frame(timestamp) {
+  const elapsed = timestamp - startTime;
+  const progress = Math.min(elapsed / totalMs, 1);
+  const secRemaining = Math.ceil((totalMs - elapsed) / 1000);
+
+  progressBar.style.strokeDashoffset = `${circumference * progress}px`;
+
+  if (secRemaining !== remaining) {
+    remaining = secRemaining;
+    updateDisplay(remaining);
+    timeEl.classList.add('tick');
+    setTimeout(() => timeEl.classList.remove('tick'), 150);
+  }
+
+  if (progress < 1) {
+    rafId = requestAnimationFrame(frame);
   } else {
-    clearInterval(timerId);
-    timerId = null;
+    paused = true;
+    timeEl.classList.add('complete');
+    launchConfetti();
   }
 }
 
 startBtn.addEventListener('click', () => {
-  if (timerId) return;
-  timerId = setInterval(tick, 1000);
+  if (!paused) return;
+  paused = false;
+  startTime = performance.now() - (duration - remaining) * 1000;
+  rafId = requestAnimationFrame(frame);
 });
 
 pauseBtn.addEventListener('click', () => {
-  clearInterval(timerId);
-  timerId = null;
+  if (paused) return;
+  paused = true;
+  cancelAnimationFrame(rafId);
 });
 
 resetBtn.addEventListener('click', () => {
-  clearInterval(timerId);
-  timerId = null;
+  cancelAnimationFrame(rafId);
+  paused = true;
   remaining = duration;
-  updateDisplay();
+  updateDisplay(remaining);
+  progressBar.style.strokeDashoffset = '0px';
   timeEl.classList.remove('complete');
 });
 
-updateDisplay();
+updateDisplay(remaining);
 
 // Journal logic
 const entryDate = document.getElementById('entry-date');
 const entryText = document.getElementById('entry-text');
+const entryMedia = document.getElementById('entry-media');
 const saveEntry = document.getElementById('save-entry');
 const entriesEl = document.getElementById('entries');
+const mediaPreview = document.getElementById('media-preview');
+const errorEl = document.getElementById('error');
 
 function today() {
   return new Date().toISOString().split('T')[0];
@@ -59,14 +83,72 @@ function today() {
 
 entryDate.value = today();
 
-saveEntry.addEventListener('click', () => {
+saveEntry.addEventListener('click', async () => {
   const date = entryDate.value;
   const text = entryText.value.trim();
-  if (!date || !text) return;
-  localStorage.setItem('journal-' + date, text);
-  entryText.value = '';
-  renderEntries();
+  const file = entryMedia.files[0];
+  errorEl.textContent = '';
+  if (!date || (!text && !file)) return;
+
+  let media, mediaType;
+  try {
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error('File too large');
+      }
+      media = await readFileAsDataURL(file);
+      mediaType = file.type;
+    } else {
+      const existing = JSON.parse(localStorage.getItem('journal-' + date) || '{}');
+      media = existing.media;
+      mediaType = existing.mediaType;
+    }
+
+    const entryObj = { text, media, mediaType };
+    localStorage.setItem('journal-' + date, JSON.stringify(entryObj));
+    afterSave(date);
+  } catch (err) {
+    errorEl.textContent = 'Could not save media: ' + err.message;
+  }
 });
+
+entryMedia.addEventListener('change', () => {
+  const file = entryMedia.files[0];
+  mediaPreview.innerHTML = '';
+  mediaPreview.classList.remove('show');
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  let el;
+  if (file.type.startsWith('video')) {
+    el = document.createElement('video');
+    el.controls = true;
+  } else {
+    el = document.createElement('img');
+    el.alt = 'Selected media preview';
+  }
+  el.src = url;
+  mediaPreview.appendChild(el);
+  mediaPreview.classList.add('show');
+});
+
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function afterSave(date) {
+  entryText.value = '';
+  entryMedia.value = '';
+  mediaPreview.innerHTML = '';
+  mediaPreview.classList.remove('show');
+  renderEntries();
+  const saved = entriesEl.querySelector(`.entry[data-date="${date}"]`);
+  if (saved) saved.classList.add('expanded');
+}
 
 function renderEntries() {
   entriesEl.innerHTML = '';
@@ -76,7 +158,17 @@ function renderEntries() {
     .reverse();
   keys.forEach(key => {
     const date = key.replace('journal-', '');
-    const text = localStorage.getItem(key) || '';
+    const raw = localStorage.getItem(key) || '';
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch (e) {
+      data = { text: raw };
+    }
+    const text = data.text || '';
+    const media = data.media;
+    const mediaType = data.mediaType;
+
     const entry = document.createElement('div');
     entry.className = 'entry';
     entry.dataset.date = date;
@@ -87,7 +179,9 @@ function renderEntries() {
 
     const preview = document.createElement('p');
     preview.className = 'preview';
-    preview.textContent = text.slice(0, 100) + (text.length > 100 ? '…' : '');
+    preview.textContent = text
+      ? text.slice(0, 100) + (text.length > 100 ? '…' : '')
+      : '[Media]';
     entry.appendChild(preview);
 
     const full = document.createElement('p');
@@ -95,10 +189,37 @@ function renderEntries() {
     full.textContent = text;
     entry.appendChild(full);
 
+    if (media) {
+      const mediaWrap = document.createElement('div');
+      mediaWrap.className = 'media';
+      let mediaEl;
+      if (mediaType && mediaType.startsWith('video')) {
+        mediaEl = document.createElement('video');
+        mediaEl.controls = true;
+        const source = document.createElement('source');
+        source.src = media;
+        source.type = mediaType || 'video/mp4';
+        mediaEl.appendChild(source);
+      } else {
+        mediaEl = document.createElement('img');
+        mediaEl.alt = 'Journal media';
+        mediaEl.src = media;
+      }
+      mediaWrap.appendChild(mediaEl);
+      entry.appendChild(mediaWrap);
+    }
+
+    const actions = document.createElement('div');
+    actions.className = 'actions';
     const edit = document.createElement('button');
     edit.textContent = 'Edit';
     edit.className = 'edit';
-    entry.appendChild(edit);
+    const del = document.createElement('button');
+    del.textContent = 'Delete';
+    del.className = 'delete';
+    actions.appendChild(edit);
+    actions.appendChild(del);
+    entry.appendChild(actions);
 
     entriesEl.appendChild(entry);
   });
@@ -110,8 +231,38 @@ entriesEl.addEventListener('click', e => {
 
   if (e.target.classList.contains('edit')) {
     entryDate.value = entry.dataset.date;
-    entryText.value = localStorage.getItem('journal-' + entry.dataset.date) || '';
+    const raw = localStorage.getItem('journal-' + entry.dataset.date) || '';
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch (err) {
+      data = { text: raw };
+    }
+    entryText.value = data.text || '';
     entryText.focus();
+    entryMedia.value = '';
+    mediaPreview.innerHTML = '';
+    mediaPreview.classList.remove('show');
+    if (data.media) {
+      let el;
+      if (data.mediaType && data.mediaType.startsWith('video')) {
+        el = document.createElement('video');
+        el.controls = true;
+        const source = document.createElement('source');
+        source.src = data.media;
+        source.type = data.mediaType || 'video/mp4';
+        el.appendChild(source);
+      } else {
+        el = document.createElement('img');
+        el.src = data.media;
+        el.alt = 'Journal media';
+      }
+      mediaPreview.appendChild(el);
+      mediaPreview.classList.add('show');
+    }
+  } else if (e.target.classList.contains('delete')) {
+    localStorage.removeItem('journal-' + entry.dataset.date);
+    entry.remove();
   } else {
     entry.classList.toggle('expanded');
   }
@@ -123,3 +274,18 @@ function formatDate(str) {
 }
 
 renderEntries();
+
+function launchConfetti() {
+  for (let i = 0; i < 20; i++) {
+    const div = document.createElement('div');
+    div.className = 'confetti';
+    div.style.left = Math.random() * 100 + 'vw';
+    div.style.background = `hsl(${Math.random() * 360},100%,50%)`;
+    document.body.appendChild(div);
+    setTimeout(() => div.remove(), 3000);
+  }
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
