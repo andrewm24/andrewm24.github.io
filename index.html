@@ -7,22 +7,43 @@
     name="description"
     content="ZHONG blends a Pomodoro timer with a private daily journal for focused productivity."
   />
-  <title>ZHONG</title>
+  <title>PokéJournal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Press+Start+2P&display=swap"
+    rel="stylesheet"
+  />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
-    <h1>ZHONG</h1>
-    <p class="tagline">Focus & Reflect</p>
+    <div class="pokeball-wrapper">
+      <div class="pokeball" aria-hidden="true"></div>
+    </div>
+    <h1>PokéJournal</h1>
+    <p class="tagline">Catch your thoughts &amp; train your focus</p>
   </header>
+  <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png" class="pikachu" alt="" aria-hidden="true" />
 
   <main>
     <section id="timer">
       <h2>Pomodoro Timer</h2>
-      <div id="time">25:00</div>
+      <div id="time-wrapper">
+        <svg id="progress" viewBox="0 0 100 100">
+          <circle class="bg" cx="50" cy="50" r="45"></circle>
+          <circle class="bar" cx="50" cy="50" r="45"></circle>
+        </svg>
+        <div id="time">25:00</div>
+      </div>
+      <div class="duration-settings">
+        <label>Work (min)
+          <input type="number" id="work-duration" value="25" min="1" />
+        </label>
+        <label>Break (min)
+          <input type="number" id="break-duration" value="5" min="1" />
+        </label>
+      </div>
       <div class="controls">
         <button id="start">Start</button>
         <button id="pause">Pause</button>
@@ -30,11 +51,19 @@
       </div>
     </section>
 
+    <section id="pokedex">
+      <h2>Pokédex</h2>
+      <div id="captured"></div>
+    </section>
+
     <section id="journal">
       <h2>Daily Journal</h2>
       <div class="journal-input">
         <input type="date" id="entry-date" />
         <textarea id="entry-text" placeholder="Write your reflection..."></textarea>
+        <input type="file" id="entry-media" accept="image/*,video/*" />
+        <div id="media-preview" class="media-preview" aria-hidden="true"></div>
+        <p id="error" class="error" aria-live="polite"></p>
         <button id="save-entry">Save Entry</button>
       </div>
       <div id="entries"></div>
