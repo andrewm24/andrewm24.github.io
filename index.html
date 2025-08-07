@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta
     name="description"
-    content="ZHONG blends a Pomodoro timer with a private daily journal for focused productivity."
+    content="PokéJournal blends a Pomodoro timer with a private daily journal for focused productivity."
   />
   <title>PokéJournal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -49,6 +49,10 @@
         <button id="pause">Pause</button>
         <button id="reset">Reset</button>
       </div>
+      <div class="stats">
+        <p>Total Focus: <span id="total-focus">0</span> min</p>
+        <p>Sessions: <span id="session-count">0</span></p>
+      </div>
     </section>
 
     <section id="pokedex">
@@ -69,45 +73,6 @@
       <div id="entries"></div>
     </section>
   </main>
-=======
-  <title>Daily Vlog</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div id="auth" class="modal">
-    <div class="modal-content">
-      <h2 id="auth-title">Set Password</h2>
-      <input type="password" id="password" placeholder="Password" />
-      <button id="auth-btn">Save</button>
-    </div>
-  </div>
-
-  <header>
-    <h1>Daily Vlog</h1>
-    <button id="new-entry">New Entry</button>
-    <input type="date" id="calendar" />
-    <button id="export">Export</button>
-    <button id="theme-toggle">Toggle Theme</button>
-  </header>
-
-  <main id="timeline"></main>
-
-  <div id="entry-modal" class="modal">
-    <div class="modal-content">
-      <h2>New Entry</h2>
-      <textarea id="entry-text" placeholder="How was your day?"></textarea>
-      <div class="media-inputs">
-        <label>Photo: <input type="file" id="entry-photo" accept="image/*" capture="environment" /></label>
-        <label>Video: <input type="file" id="entry-video" accept="video/*" capture="environment" /></label>
-      </div>
-      <label>Mood: <input type="text" id="entry-mood" placeholder="😊" /></label>
-      <div class="modal-actions">
-        <button id="save-entry">Save</button>
-        <button id="cancel-entry">Cancel</button>
-      </div>
-    </div>
-  </div>
-
   <script src="script.js"></script>
 </body>
 </html>
