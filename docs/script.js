@@ -1,3 +1,4 @@
+yh5lrk-codex/fix-adjusting-time-dropdown-issue
 // Pokémon Pomodoro timer with journal and training mechanics
 
 // ----- Duration selectors -----
@@ -41,6 +42,13 @@ breakSelect.addEventListener('change', () => {
 
 // ----- Timer setup -----
 let remaining = focusDuration * 60;
+
+// Simple Pokémon-themed Pomodoro timer and journal
+const FOCUS_DURATION = 25 * 60; // 25 minutes
+const BREAK_DURATION = 5 * 60;  // 5 minutes
+
+let remaining = FOCUS_DURATION;
+vu3noo-codex/add-adjustable-timer-for-pokemon-capture
 let timerType = 'focus';
 let intervalId = null;
 let endTime = null;
@@ -53,6 +61,7 @@ const sessionCountEl = document.getElementById('session-count');
 const mascotEl = document.getElementById('mascot');
 const journalEl = document.getElementById('journal');
 const starterModal = document.getElementById('starter-modal');
+yh5lrk-codex/fix-adjusting-time-dropdown-issue
 const pokemonListEl = document.getElementById('pokemon-list');
 
 // ----- Pokémon data -----
@@ -137,12 +146,30 @@ function loadStarter() {
   } else {
     updateMascot();
     renderPokedex();
+
+
+// Load starter or show modal
+const starterMap = {
+  pikachu: '⚡',
+  charmander: '🔥',
+  squirtle: '💧',
+  bulbasaur: '🌱'
+};
+
+function loadStarter() {
+  const saved = localStorage.getItem('starter');
+  if (saved && starterMap[saved]) {
+    mascotEl.textContent = starterMap[saved];
+  } else {
+    starterModal.classList.remove('hidden');
+ vu3noo-codex/add-adjustable-timer-for-pokemon-capture
   }
 }
 
 starterModal.addEventListener('click', e => {
   if (e.target.classList.contains('starter')) {
     const choice = e.target.getAttribute('data-pokemon');
+ yh5lrk-codex/fix-adjusting-time-dropdown-issue
     if (!pokemonData[choice]) {
       pokemonData[choice] = { xp: 0, level: 1 };
       savePokemon();
@@ -151,21 +178,35 @@ starterModal.addEventListener('click', e => {
     localStorage.setItem('activePokemon', activePokemon);
     updateMascot();
     renderPokedex();
+
+    localStorage.setItem('starter', choice);
+    mascotEl.textContent = starterMap[choice];
+ vu3noo-codex/add-adjustable-timer-for-pokemon-capture
     starterModal.classList.add('hidden');
   }
 });
 
 loadStarter();
 
+ yh5lrk-codex/fix-adjusting-time-dropdown-issue
 // ----- Journal persistence -----
+
+// Journal persistence
+ vu3noo-codex/add-adjustable-timer-for-pokemon-capture
 journalEl.value = localStorage.getItem('journal') || '';
 journalEl.addEventListener('input', () => {
   localStorage.setItem('journal', journalEl.value);
 });
 
+ yh5lrk-codex/fix-adjusting-time-dropdown-issue
 // ----- Session count persistence per day -----
 function getTodayKey() {
   return 'sessions-' + new Date().toISOString().slice(0, 10);
+
+// Session count persistence per day
+function getTodayKey() {
+  return 'sessions-' + new Date().toISOString().slice(0,10);
+ vu3noo-codex/add-adjustable-timer-for-pokemon-capture
 }
 
 function loadSessions() {
@@ -177,11 +218,15 @@ function incrementSessions() {
   const current = parseInt(localStorage.getItem(key) || '0', 10) + 1;
   localStorage.setItem(key, current);
   sessionCountEl.textContent = current;
+ yh5lrk-codex/fix-adjusting-time-dropdown-issue
   awardXP();
+
+ vu3noo-codex/add-adjustable-timer-for-pokemon-capture
 }
 
 loadSessions();
 
+ yh5lrk-codex/fix-adjusting-time-dropdown-issue
 // ----- XP and leveling -----
 function awardXP() {
   if (!activePokemon) return;
@@ -196,6 +241,9 @@ function awardXP() {
 }
 
 // ----- Timer logic -----
+=======
+// Timer logic
+ vu3noo-codex/add-adjustable-timer-for-pokemon-capture
 function updateDisplay() {
   const minutes = String(Math.floor(remaining / 60)).padStart(2, '0');
   const seconds = String(remaining % 60).padStart(2, '0');
@@ -212,11 +260,19 @@ function tick() {
     if (timerType === 'focus') {
       incrementSessions();
       timerType = 'break';
+ yh5lrk-codex/fix-adjusting-time-dropdown-issue
       remaining = breakDuration * 60;
       startTimer();
     } else {
       timerType = 'focus';
       remaining = focusDuration * 60;
+
+      remaining = BREAK_DURATION;
+      startTimer();
+    } else {
+      timerType = 'focus';
+      remaining = FOCUS_DURATION;
+ vu3noo-codex/add-adjustable-timer-for-pokemon-capture
     }
   }
 }
@@ -240,7 +296,11 @@ function resetTimer() {
   clearInterval(intervalId);
   intervalId = null;
   timerType = 'focus';
+ yh5lrk-codex/fix-adjusting-time-dropdown-issue
   remaining = focusDuration * 60;
+
+  remaining = FOCUS_DURATION;
+ vu3noo-codex/add-adjustable-timer-for-pokemon-capture
   updateDisplay();
   mascotEl.classList.remove('running');
 }
@@ -250,4 +310,7 @@ pauseBtn.addEventListener('click', pauseTimer);
 resetBtn.addEventListener('click', resetTimer);
 
 updateDisplay();
+ yh5lrk-codex/fix-adjusting-time-dropdown-issue
 renderPokedex();
+
+ vu3noo-codex/add-adjustable-timer-for-pokemon-capture
