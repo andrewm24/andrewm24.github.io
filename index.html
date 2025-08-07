@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZHONG</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>ZHONG</h1>
+    <p class="tagline">Focus & Reflect</p>
+  </header>
+
+  <main>
+    <section id="timer">
+      <h2>Pomodoro Timer</h2>
+      <div id="time">25:00</div>
+      <div class="controls">
+        <button id="start">Start</button>
+        <button id="pause">Pause</button>
+        <button id="reset">Reset</button>
+      </div>
+    </section>
+
+    <section id="journal">
+      <h2>Daily Journal</h2>
+      <div class="journal-input">
+        <input type="date" id="entry-date" />
+        <textarea id="entry-text" placeholder="Write your reflection..."></textarea>
+        <button id="save-entry">Save Entry</button>
+      </div>
+      <div id="entries"></div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

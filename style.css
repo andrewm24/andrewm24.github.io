@@ -1,0 +1,150 @@
+:root {
+  --bg: #f5f7fa;
+  --text: #374151;
+  --accent: #7aa2d2;
+  --card: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
+header {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.tagline {
+  margin-top: 0.25rem;
+  color: #6b7280;
+}
+
+main {
+  width: 90%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem 0;
+}
+
+section {
+  background: var(--card);
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+#timer #time {
+  font-size: 3rem;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+button:hover {
+  opacity: 0.85;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.journal-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+#entries .entry {
+  padding: 1rem 0;
+  border-bottom: 1px solid #e5e7eb;
+  cursor: pointer;
+  opacity: 0;
+  animation: fadeIn 0.3s forwards;
+}
+
+#entries .entry:last-child {
+  border-bottom: none;
+}
+
+#entries .entry h3 {
+  margin: 0 0 0.25rem;
+}
+
+#entries .entry .preview {
+  color: #6b7280;
+}
+
+#entries .entry .full {
+  display: none;
+  margin-top: 0.5rem;
+}
+
+#entries .entry.expanded .full {
+  display: block;
+}
+
+#entries .entry button.edit {
+  margin-top: 0.5rem;
+  background: transparent;
+  color: var(--accent);
+  padding: 0;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+#time.complete {
+  color: var(--accent);
+  animation: pulse 1s ease-in-out 2;
+}
