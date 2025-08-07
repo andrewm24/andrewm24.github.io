@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PokéJournal</title>
+  <link rel="stylesheet" href="style.css?v=1.1" />
+</head>
+<body>
+  <div id="starter-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Choose Your Starter</h2>
+      <div class="starters">
+        <button class="starter" data-pokemon="pikachu">⚡</button>
+        <button class="starter" data-pokemon="charmander">🔥</button>
+        <button class="starter" data-pokemon="squirtle">💧</button>
+        <button class="starter" data-pokemon="bulbasaur">🌱</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="container">
+    <header>
+      <h1>PokéJournal</h1>
+    </header>
+
+    <section id="timer-section">
+      <div id="mascot" class="mascot">⚡</div>
+      <div id="timer-display">25:00</div>
+      <div class="duration-selects">
+        <label>Work:
+          <select id="work-duration"></select>
+        </label>
+        <label>Break:
+          <select id="break-duration"></select>
+        </label>
+      </div>
+      <div class="controls">
+        <button id="start">Start</button>
+        <button id="pause">Pause</button>
+        <button id="reset">Reset</button>
+      </div>
+      <p>Sessions Today: <span id="session-count">0</span></p>
+    </section>
+
+    <section id="journal-section">
+      <h2>Trainer's Log</h2>
+      <textarea id="journal" placeholder="Record your adventure..."></textarea>
+    </section>
+
+    <section id="pokedex-section">
+      <h2>Pokédex</h2>
+      <ul id="pokemon-list"></ul>
+    </section>
+  </main>
+
+  <script src="script.js?v=1.1"></script>
+</body>
+</html>
