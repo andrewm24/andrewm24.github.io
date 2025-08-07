@@ -18,7 +18,9 @@
 </head>
 <body>
   <header>
-    <div class="pokeball" aria-hidden="true"></div>
+    <div class="pokeball-wrapper">
+      <div class="pokeball" aria-hidden="true"></div>
+    </div>
     <h1>PokéJournal</h1>
     <p class="tagline">Catch your thoughts &amp; train your focus</p>
   </header>
@@ -46,6 +48,7 @@
         <input type="date" id="entry-date" />
         <textarea id="entry-text" placeholder="Write your reflection..."></textarea>
         <input type="file" id="entry-media" accept="image/*,video/*" />
+        <div id="media-preview" class="media-preview" aria-hidden="true"></div>
         <button id="save-entry">Save Entry</button>
       </div>
       <div id="entries"></div>

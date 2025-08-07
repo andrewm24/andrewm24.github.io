@@ -73,6 +73,7 @@ const entryText = document.getElementById('entry-text');
 const entryMedia = document.getElementById('entry-media');
 const saveEntry = document.getElementById('save-entry');
 const entriesEl = document.getElementById('entries');
+const mediaPreview = document.getElementById('media-preview');
 
 function today() {
   return new Date().toISOString().split('T')[0];
@@ -101,6 +102,25 @@ saveEntry.addEventListener('click', async () => {
   afterSave(date);
 });
 
+entryMedia.addEventListener('change', () => {
+  const file = entryMedia.files[0];
+  mediaPreview.innerHTML = '';
+  mediaPreview.classList.remove('show');
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  let el;
+  if (file.type.startsWith('video')) {
+    el = document.createElement('video');
+    el.controls = true;
+  } else {
+    el = document.createElement('img');
+    el.alt = 'Selected media preview';
+  }
+  el.src = url;
+  mediaPreview.appendChild(el);
+  mediaPreview.classList.add('show');
+});
+
 function readFileAsDataURL(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -113,6 +133,8 @@ function readFileAsDataURL(file) {
 function afterSave(date) {
   entryText.value = '';
   entryMedia.value = '';
+  mediaPreview.innerHTML = '';
+  mediaPreview.classList.remove('show');
   renderEntries();
   const saved = entriesEl.querySelector(`.entry[data-date="${date}"]`);
   if (saved) saved.classList.add('expanded');
