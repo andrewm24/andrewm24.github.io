@@ -58,37 +58,6 @@ duration = workDuration;
 remaining = duration;
 totalMs = duration * 1000;
 
-xe5vmk-codex/add-adjustable-timer-for-pokemon-capture
-function populateDropdown(select, defaultValue) {
-  for (let i = 1; i <= 60; i++) {
-    const option = document.createElement('option');
-    option.value = i;
-    option.textContent = i;
-    select.appendChild(option);
-  }
-  select.value = defaultValue;
-}
-
-populateDropdown(workInput, 25);
-populateDropdown(breakInput, 5);
-
-
-main
-// Load saved durations or fall back to defaults
-const savedWork = parseInt(localStorage.getItem('work-duration'), 10);
-const savedBreak = parseInt(localStorage.getItem('break-duration'), 10);
-if (!isNaN(savedWork)) {
-  workDuration = savedWork * 60;
-  workInput.value = savedWork;
-}
-if (!isNaN(savedBreak)) {
-  breakDuration = savedBreak * 60;
-  breakInput.value = savedBreak;
-}
-duration = workDuration;
-remaining = duration;
-totalMs = duration * 1000;
-
 function updateDisplay(secRemaining) {
   const mins = String(Math.floor(secRemaining / 60)).padStart(2, '0');
   const secs = String(secRemaining % 60).padStart(2, '0');
