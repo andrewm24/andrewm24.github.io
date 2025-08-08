@@ -25,6 +25,19 @@
         </div>
         <h1>PokéJournal</h1>
         <p class="tagline">Catch your thoughts &amp; train your focus</p>
+        <p id="user-info" class="user-info hidden">
+          <span id="user-name"></span>
+          <span id="trainer-name"></span>
+        </p>
+        <div id="partner-display" class="partner hidden">
+          <img id="partner-sprite" alt="" />
+          <div class="partner-meta">
+            <span id="partner-name"></span>
+            <span id="partner-level"></span>
+            <div class="xp-bar"><div id="partner-xp-bar"></div></div>
+          </div>
+        </div>
+        <button id="open-pokedex">Pokédex</button>
       </header>
       <img
         id="background-pokemon"
@@ -42,8 +55,8 @@
           <circle class="bg" cx="50" cy="50" r="45"></circle>
           <circle class="bar" cx="50" cy="50" r="45"></circle>
         </svg>
-        <div id="time">25:00</div>
       </div>
+      <div id="time">25:00</div>
       <div class="duration-settings">
         <label>Work (min)
           <select id="work-duration"></select>
@@ -60,12 +73,8 @@
       <div class="stats">
         <p>Total Focus: <span id="total-focus">0</span> min</p>
         <p>Sessions: <span id="session-count">0</span></p>
+        <p>XP: <span id="xp">0</span></p>
       </div>
-    </section>
-
-    <section id="pokedex">
-      <h2>Pokédex</h2>
-      <div id="captured"></div>
     </section>
 
     <section id="journal">
@@ -77,24 +86,86 @@
         <div id="media-preview" class="media-preview" aria-hidden="true"></div>
         <p id="error" class="error" aria-live="polite"></p>
         <button id="save-entry">Save Entry</button>
-  </div>
-  <div id="entries"></div>
+      </div>
+      <div class="journal-actions">
+        <input
+          type="text"
+          id="search-journal"
+          placeholder="Search entries..."
+          aria-label="Search journal entries"
+        />
+        <button id="export-journal">Export Journal</button>
+      </div>
+      <div id="entries"></div>
     </section>
       </main>
     </div>
   </div>
-tg1rpx-codex/update-website-theme-to-retro-pokedex-style
+  <div id="login-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Login</h2>
+      <input type="text" id="username" placeholder="Username" />
+      <input type="password" id="password" placeholder="Password" />
+      <div class="login-actions">
+        <button id="register-btn">Register</button>
+        <button id="login-btn">Login</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="trainer-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Choose your trainer!</h2>
+      <div class="trainers">
+        <button data-id="red">Red</button>
+        <button data-id="leaf">Leaf</button>
+        <button data-id="ethan">Ethan</button>
+      </div>
+    </div>
+  </div>
+
   <div id="starter-modal" class="modal hidden">
     <div class="modal-content">
       <h2>Choose your starter!</h2>
       <div class="starters">
-        <img data-id="1" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png" alt="Bulbasaur" />
-        <img data-id="4" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png" alt="Charmander" />
-        <img data-id="7" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png" alt="Squirtle" />
+        <img
+          data-id="1"
+          src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png"
+          alt="Bulbasaur"
+        />
+        <img
+          data-id="4"
+          src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png"
+          alt="Charmander"
+        />
+        <img
+          data-id="7"
+          src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png"
+          alt="Squirtle"
+        />
       </div>
     </div>
   </div>
-main
+
+  <div id="pokedex-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Your Pokémon</h2>
+      <div id="pokemon-grid" class="grid"></div>
+    </div>
+  </div>
+
+  <div id="pokemon-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2 id="modal-name"></h2>
+      <img id="modal-sprite" alt="" />
+      <p id="modal-type"></p>
+      <div class="xp-bar"><div id="modal-xp-bar"></div></div>
+      <p id="modal-level"></p>
+      <p id="modal-xp"></p>
+      <p id="modal-desc"></p>
+      <button id="set-partner">Set as Partner</button>
+    </div>
+  </div>
   <script src="script.js"></script>
 </body>
 </html>
