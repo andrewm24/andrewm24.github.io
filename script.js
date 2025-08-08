@@ -10,6 +10,12 @@ while ((strayNode = strayWalker.nextNode())) {
     strayNode.textContent = '';
   }
 }
+// Strip stray branch text that can appear at the top of the page
+Array.from(document.body.childNodes).forEach(node => {
+  if (node.nodeType === Node.TEXT_NODE && /codex\//i.test(node.textContent)) {
+    node.remove();
+  }
+});
 
 // Timer logic
 let workDuration = 25 * 60;
