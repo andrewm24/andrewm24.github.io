@@ -19,6 +19,7 @@ A minimalist, Pokémon-themed web app that combines a Pomodoro-style timer with 
 - Capture new Pokémon for your Pokédex as total XP milestones are met
 - Search journal entries and export or import them as JSON
 - Tag entries and filter by tag
+- Upload large videos (up to 500 MB) with a progress bar when the backend is running
 
 ## Usage
 
@@ -35,7 +36,8 @@ npm start
 ```
 
 The server persists user credentials in a SQLite database, streams uploaded
-journal videos to disk, **and** serves the frontend so you can visit
+journal videos to disk (up to 500 MB each) and surfaces an upload progress bar
+in the journal. It also serves the frontend so you can visit
 `http://localhost:3000` to use PokéJournal with authentication enabled.
 
 If you open the static files directly (e.g. via GitHub Pages), the app will

@@ -217,6 +217,7 @@ const entryTags = document.getElementById('entry-tags');
 const saveEntry = document.getElementById('save-entry');
 const entriesEl = document.getElementById('entries');
 const mediaPreview = document.getElementById('media-preview');
+const uploadProgress = document.getElementById('upload-progress');
 const errorEl = document.getElementById('error');
 const searchJournal = document.getElementById('search-journal');
 const exportJournal = document.getElementById('export-journal');
@@ -244,6 +245,7 @@ saveEntry.addEventListener('click', async () => {
   try {
     if (file) {
       if (file.type.startsWith('video') || file.size > 5 * 1024 * 1024) {
+        if (!authToken) throw new Error('Login required for large files');
         media = await uploadMedia(file);
         mediaType = file.type;
       } else {
@@ -337,14 +339,44 @@ importFileInput?.addEventListener('change', () => {
   importFileInput.value = '';
 });
 
-async function uploadMedia(file) {
-  const form = new FormData();
-  form.append('media', file);
-  const headers = authToken ? { Authorization: 'Bearer ' + authToken } : {};
-  const res = await fetch(API_BASE + '/api/upload', { method: 'POST', body: form, headers });
-  if (!res.ok) throw new Error('Upload failed');
-  const data = await res.json();
-  return data.url;
+function uploadMedia(file) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', API_BASE + '/api/upload');
+    if (authToken) xhr.setRequestHeader('Authorization', 'Bearer ' + authToken);
+
+    xhr.upload.onprogress = e => {
+      if (e.lengthComputable) {
+        uploadProgress.max = e.total;
+        uploadProgress.value = e.loaded;
+        uploadProgress.classList.add('show');
+      }
+    };
+
+    xhr.onload = () => {
+      uploadProgress.classList.remove('show');
+      if (xhr.status === 200) {
+        try {
+          const data = JSON.parse(xhr.responseText);
+          resolve(data.url);
+        } catch {
+          reject(new Error('Upload failed'));
+        }
+      } else {
+        const msg = xhr.status === 413 ? 'File too large' : 'Upload failed';
+        reject(new Error(msg));
+      }
+    };
+
+    xhr.onerror = () => {
+      uploadProgress.classList.remove('show');
+      reject(new Error('Upload failed'));
+    };
+
+    const form = new FormData();
+    form.append('media', file);
+    xhr.send(form);
+  });
 }
 
 function readFileAsDataURL(file) {
@@ -362,6 +394,8 @@ function afterSave(date) {
   entryMedia.value = '';
   mediaPreview.innerHTML = '';
   mediaPreview.classList.remove('show');
+  uploadProgress.value = 0;
+  uploadProgress.classList.remove('show');
   renderEntries();
   const saved = entriesEl.querySelector(`.entry[data-date="${date}"]`);
   if (saved) saved.classList.add('expanded');

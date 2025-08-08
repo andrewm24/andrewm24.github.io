@@ -74,7 +74,16 @@ const storage = multer.diskStorage({
     cb(null, unique + path.extname(file.originalname));
   }
 });
-const upload = multer({ storage, limits: { fileSize: 50 * 1024 * 1024 } });
+// Allow larger video uploads (up to 500 MB) so daily vlogs can be saved
+const upload = multer({ storage, limits: { fileSize: 500 * 1024 * 1024 } });
+
+// Return a clear error when the file exceeds the limit
+app.use((err, req, res, next) => {
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(413).json({ error: 'File too large' });
+  }
+  next(err);
+});
 
 // Media upload endpoint
 app.post('/api/upload', auth, upload.single('media'), (req, res) => {

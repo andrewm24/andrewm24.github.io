@@ -331,6 +331,19 @@ input[type="file"] {
   min-height: 1.25rem;
 }
 
+/* Upload progress bar */
+#upload-progress,
+.upload-progress {
+  display: none;
+  width: 100%;
+  height: 0.5rem;
+}
+
+#upload-progress.show,
+.upload-progress.show {
+  display: block;
+}
+
 /* Partner display */
 .partner {
   display: flex;
