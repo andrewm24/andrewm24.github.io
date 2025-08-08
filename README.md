@@ -16,7 +16,8 @@ A minimalist, Pokémon-themed web app that combines a Pomodoro-style timer with 
 - Log in and pick a trainer before choosing your starter Pokémon
 - Earn XP for each focus session (+10) and journal entry (+5) to level Pokémon
 - Capture new Pokémon for your Pokédex as total XP milestones are met
-- Search journal entries and export them as JSON
+- Search journal entries and export or import them as JSON
+- Tag entries and filter by tag
 
 ## Usage
 

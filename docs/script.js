@@ -190,12 +190,15 @@ renderStats();
 const entryDate = document.getElementById('entry-date');
 const entryText = document.getElementById('entry-text');
 const entryMedia = document.getElementById('entry-media');
+const entryTags = document.getElementById('entry-tags');
 const saveEntry = document.getElementById('save-entry');
 const entriesEl = document.getElementById('entries');
 const mediaPreview = document.getElementById('media-preview');
 const errorEl = document.getElementById('error');
 const searchJournal = document.getElementById('search-journal');
 const exportJournal = document.getElementById('export-journal');
+const importJournalBtn = document.getElementById('import-journal');
+const importFileInput = document.getElementById('import-file');
 
 function today() {
   return new Date().toISOString().split('T')[0];
@@ -206,6 +209,10 @@ entryDate.value = today();
 saveEntry.addEventListener('click', async () => {
   const date = entryDate.value;
   const text = entryText.value.trim();
+  const tags = entryTags.value
+    .split(',')
+    .map(t => t.trim())
+    .filter(Boolean);
   const file = entryMedia.files[0];
   errorEl.textContent = '';
   if (!date || (!text && !file)) return;
@@ -226,7 +233,7 @@ saveEntry.addEventListener('click', async () => {
       mediaType = existing.mediaType;
     }
 
-    const entryObj = { text, media, mediaType };
+    const entryObj = { text, tags, media, mediaType };
     localStorage.setItem('journal-' + date, JSON.stringify(entryObj));
     afterSave(date);
     addXP(partnerPokemonId, 5);
@@ -283,6 +290,30 @@ exportJournal?.addEventListener('click', () => {
   URL.revokeObjectURL(url);
 });
 
+importJournalBtn?.addEventListener('click', () => importFileInput?.click());
+
+importFileInput?.addEventListener('change', () => {
+  const file = importFileInput.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data && typeof data === 'object') {
+        Object.entries(data).forEach(([date, entry]) => {
+          localStorage.setItem('journal-' + date, JSON.stringify(entry));
+        });
+        showToast('Journal imported');
+        renderEntries();
+      }
+    } catch {
+      showToast('Import failed');
+    }
+  };
+  reader.readAsText(file);
+  importFileInput.value = '';
+});
+
 async function uploadMedia(file) {
   const form = new FormData();
   form.append('media', file);
@@ -304,6 +335,7 @@ function readFileAsDataURL(file) {
 
 function afterSave(date) {
   entryText.value = '';
+  entryTags.value = '';
   entryMedia.value = '';
   mediaPreview.innerHTML = '';
   mediaPreview.classList.remove('show');
@@ -332,10 +364,12 @@ function renderEntries() {
     const text = data.text || '';
     const media = data.media;
     const mediaType = data.mediaType;
+    const tags = data.tags || [];
     if (
       term &&
       !text.toLowerCase().includes(term) &&
-      !formatDate(date).toLowerCase().includes(term)
+      !formatDate(date).toLowerCase().includes(term) &&
+      !tags.some(t => t.toLowerCase().includes(term))
     ) {
       return;
     }
@@ -380,6 +414,17 @@ function renderEntries() {
       entry.appendChild(mediaWrap);
     }
 
+    if (tags.length) {
+      const tagWrap = document.createElement('div');
+      tagWrap.className = 'tags';
+      tags.forEach(t => {
+        const span = document.createElement('span');
+        span.textContent = t;
+        tagWrap.appendChild(span);
+      });
+      entry.appendChild(tagWrap);
+    }
+
     const actions = document.createElement('div');
     actions.className = 'actions';
     const edit = document.createElement('button');
@@ -416,6 +461,7 @@ entriesEl.addEventListener('click', e => {
       data = { text: raw };
     }
     entryText.value = data.text || '';
+    entryTags.value = (data.tags || []).join(', ');
     entryText.focus();
     entryMedia.value = '';
     mediaPreview.innerHTML = '';
