@@ -50,6 +50,87 @@ const capturedPokemon = JSON.parse(localStorage.getItem('capturedPokemon') || '[
 let partnerPokemonId = localStorage.getItem('partnerPokemonId');
 let pokemonData = [];
 
+// Track focused minutes per day in localStorage
+function getFocusStats() {
+  return JSON.parse(localStorage.getItem('focusStats') || '{}');
+}
+
+// Save minutes to today's total and persist
+function saveFocusMinutes(mins) {
+  const stats = getFocusStats();
+  const today = new Date().toISOString().split('T')[0];
+  stats[today] = (stats[today] || 0) + mins;
+  localStorage.setItem('focusStats', JSON.stringify(stats));
+}
+
+let focusChart;
+
+// Render a bar chart for the last 7 days of focus data
+function renderChart() {
+  const chartEl = document.getElementById('focusChart');
+  if (!chartEl || typeof Chart === 'undefined') return;
+  const stats = getFocusStats();
+  const labels = Object.keys(stats).sort().slice(-7);
+  const data = labels.map(d => stats[d]);
+  if (focusChart) focusChart.destroy();
+  focusChart = new Chart(chartEl.getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Minutes',
+          data,
+          backgroundColor: 'rgba(255,99,132,0.8)'
+        }
+      ]
+    },
+    options: {
+      plugins: {
+        title: { display: true, text: 'Minutes Focused' }
+      },
+      scales: {
+        x: { title: { display: true, text: 'Date' } },
+        y: { beginAtZero: true, title: { display: true, text: 'Minutes' } }
+      }
+    }
+  });
+}
+
+// Render summary stats: total minutes, best day, and streak
+function renderStatsSummary() {
+  const summaryEl = document.getElementById('focus-summary');
+  if (!summaryEl) return;
+  const stats = getFocusStats();
+  const entries = Object.entries(stats);
+  const total = entries.reduce((sum, [, v]) => sum + v, 0);
+  let bestDay = 'N/A';
+  let bestVal = 0;
+  for (const [day, val] of entries) {
+    if (val > bestVal) {
+      bestVal = val;
+      bestDay = day;
+    }
+  }
+  const today = new Date();
+  let streakCount = 0;
+  for (let i = 0; ; i++) {
+    const d = new Date(today.getTime() - i * 86400000)
+      .toISOString()
+      .split('T')[0];
+    if (stats[d]) {
+      streakCount++;
+    } else {
+      break;
+    }
+  }
+  summaryEl.innerHTML = `
+    <p>Total Minutes: ${total}</p>
+    <p>Most Productive Day: ${bestDay}${bestVal ? ` (${bestVal} min)` : ''}</p>
+    <p>Current Streak: ${streakCount} day${streakCount === 1 ? '' : 's'}</p>
+  `;
+}
+
 function renderStats() {
   if (totalFocusEl) totalFocusEl.textContent = totalFocus;
   if (sessionCountEl) sessionCountEl.textContent = sessionCount;
@@ -118,6 +199,8 @@ totalMs = duration * 1000;
 
 checkStreak();
 renderStats();
+renderChart();
+renderStatsSummary();
 
 function updateDisplay(secRemaining) {
   const mins = String(Math.floor(secRemaining / 60)).padStart(2, '0');
@@ -151,6 +234,9 @@ function frame(timestamp) {
       localStorage.setItem('session-count', sessionCount);
       updateStreak();
       renderStats();
+      saveFocusMinutes(gained);
+      renderChart();
+      renderStatsSummary();
       launchConfetti();
       isBreak = true;
       duration = breakDuration;

@@ -14,7 +14,7 @@
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Press+Start+2P&display=swap"
     rel="stylesheet"
   />
-  <link rel="stylesheet" href="style.css?v=10" />
+  <link rel="stylesheet" href="style.css?v=11" />
 </head>
 <body>
   <div class="pokedex">
@@ -79,6 +79,8 @@
         <p>XP: <span id="xp">0</span></p>
         <p>Streak: <span id="streak">0</span> days</p>
       </div>
+      <canvas id="focusChart"></canvas>
+      <div id="focus-summary" class="focus-summary"></div>
     </section>
 
     <section id="journal">
@@ -176,6 +178,7 @@
       <button id="set-partner">Set as Partner</button>
     </div>
   </div>
-  <script src="script.js?v=10"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js?v=11"></script>
 </body>
 </html>

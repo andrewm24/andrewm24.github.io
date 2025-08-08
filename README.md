@@ -20,6 +20,7 @@ A minimalist, Pokémon-themed web app that combines a Pomodoro-style timer with 
 - Search journal entries and export or import them as JSON
 - Tag entries and filter by tag
 - Upload large videos (up to 500 MB) with a progress bar when the backend is running
+- Log daily focused minutes and view a 7‑day focus chart with summary stats
 
 ## Usage
 

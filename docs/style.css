@@ -198,6 +198,16 @@ main > section:nth-of-type(2) {
   font-weight: 600;
 }
 
+#focusChart {
+  max-width: 100%;
+  margin-top: 1rem;
+}
+
+.focus-summary {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+}
+
 .duration-settings {
   display: flex;
   justify-content: center;
