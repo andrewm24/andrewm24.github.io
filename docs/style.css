@@ -230,7 +230,7 @@ main > section:nth-of-type(2) {
 }
 
 #progress circle.bar {
-  stroke: var(--border);
+  stroke: var(--complete);
   stroke-dasharray: 282.743px;
   stroke-dashoffset: 0;
 }
@@ -575,25 +575,9 @@ textarea:focus {
   }
 }
 
-@keyframes tick {
-  0% {
-    transform: translate(-50%, -50%) scale(1);
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.1);
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(1);
-  }
-}
-
 #time.complete {
   color: var(--complete);
   animation: pulse 1s ease-in-out 2;
-}
-
-#time.tick {
-  animation: tick 0.5s ease-in-out;
 }
 
 @keyframes spin {

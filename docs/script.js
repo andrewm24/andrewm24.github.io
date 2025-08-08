@@ -98,8 +98,6 @@ function frame(timestamp) {
   if (secRemaining !== remaining) {
     remaining = secRemaining;
     updateDisplay(remaining);
-    timeEl.classList.add('tick');
-    setTimeout(() => timeEl.classList.remove('tick'), 150);
   }
 
   if (progress < 1) {
@@ -440,8 +438,11 @@ entriesEl.addEventListener('click', e => {
       mediaPreview.classList.add('show');
     }
   } else if (e.target.classList.contains('delete')) {
-    localStorage.removeItem('journal-' + entry.dataset.date);
-    entry.remove();
+    if (confirm('Delete this entry?')) {
+      localStorage.removeItem('journal-' + entry.dataset.date);
+      entry.remove();
+      showToast('Entry deleted');
+    }
   } else {
     entry.classList.toggle('expanded');
   }

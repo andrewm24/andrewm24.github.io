@@ -1,9 +1,9 @@
-const CACHE = 'pokejournal-v5';
+const CACHE = 'pokejournal-v6';
 const ASSETS = [
   './',
   './index.html',
-  './style.css',
-  './script.js',
+  './style.css?v=6',
+  './script.js?v=6',
   './pokemon-data.json'
 ];
 
