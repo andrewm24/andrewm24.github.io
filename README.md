@@ -13,6 +13,9 @@ A minimalist, Pokémon-themed web app that combines a Pomodoro-style timer with 
 - Optional browser notification announcing each Pokémon you catch
 - Calming, responsive layout with playful Pokémon styling and subtle animations
 - Offline-ready via simple service worker caching
+- Log in and pick a trainer before choosing your starter Pokémon
+- Earn XP for each focus session and capture a new Pokémon after reaching the XP threshold
+- Search journal entries and export them as JSON
 
 ## Usage
 
