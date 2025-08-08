@@ -302,6 +302,13 @@ textarea {
   min-height: 100px;
 }
 
+.word-count {
+  font-size: 0.8rem;
+  color: var(--border);
+  text-align: right;
+  margin-top: -0.5rem;
+}
+
 input[type="file"] {
   border: 1px dashed var(--border);
   border-radius: 6px;

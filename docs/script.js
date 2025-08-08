@@ -223,12 +223,77 @@ const searchJournal = document.getElementById('search-journal');
 const exportJournal = document.getElementById('export-journal');
 const importJournalBtn = document.getElementById('import-journal');
 const importFileInput = document.getElementById('import-file');
+const wordCountEl = document.getElementById('word-count');
 
 function today() {
   return new Date().toISOString().split('T')[0];
 }
 
 entryDate.value = today();
+loadEntry();
+entryDate.addEventListener('change', loadEntry);
+
+function updateWordCount() {
+  const words = entryText.value.trim().split(/\s+/).filter(Boolean).length;
+  wordCountEl.textContent = `${words} word${words !== 1 ? 's' : ''}`;
+}
+
+function saveDraft() {
+  const draft = { text: entryText.value, tags: entryTags.value };
+  localStorage.setItem('draft-' + entryDate.value, JSON.stringify(draft));
+}
+
+function loadEntry() {
+  const date = entryDate.value;
+  const saved = localStorage.getItem('journal-' + date);
+  const draft = localStorage.getItem('draft-' + date);
+  let data = null;
+  if (saved) {
+    try {
+      data = JSON.parse(saved);
+    } catch {
+      data = { text: saved };
+    }
+  } else if (draft) {
+    try {
+      data = JSON.parse(draft);
+    } catch {
+      data = { text: draft };
+    }
+  }
+  entryText.value = data?.text || '';
+  entryTags.value = Array.isArray(data?.tags)
+    ? data.tags.join(', ')
+    : data?.tags || '';
+  entryMedia.value = '';
+  mediaPreview.innerHTML = '';
+  mediaPreview.classList.remove('show');
+  if (data?.media) {
+    let el;
+    if (data.mediaType && data.mediaType.startsWith('video')) {
+      el = document.createElement('video');
+      el.controls = true;
+      const source = document.createElement('source');
+      source.src = data.media;
+      source.type = data.mediaType || 'video/mp4';
+      el.appendChild(source);
+    } else {
+      el = document.createElement('img');
+      el.src = data.media;
+      el.alt = 'Journal media';
+    }
+    mediaPreview.appendChild(el);
+    mediaPreview.classList.add('show');
+  }
+  updateWordCount();
+}
+
+entryText.addEventListener('input', () => {
+  updateWordCount();
+  saveDraft();
+});
+
+entryTags.addEventListener('input', saveDraft);
 
 saveEntry.addEventListener('click', async () => {
   const date = entryDate.value;
@@ -396,6 +461,8 @@ function afterSave(date) {
   mediaPreview.classList.remove('show');
   uploadProgress.value = 0;
   uploadProgress.classList.remove('show');
+  localStorage.removeItem('draft-' + date);
+  updateWordCount();
   renderEntries();
   const saved = entriesEl.querySelector(`.entry[data-date="${date}"]`);
   if (saved) saved.classList.add('expanded');
@@ -519,6 +586,7 @@ entriesEl.addEventListener('click', e => {
     }
     entryText.value = data.text || '';
     entryTags.value = (data.tags || []).join(', ');
+    updateWordCount();
     entryText.focus();
     entryMedia.value = '';
     mediaPreview.innerHTML = '';
