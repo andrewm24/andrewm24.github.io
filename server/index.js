@@ -5,8 +5,10 @@ const multer = require('multer');
 const sqlite3 = require('sqlite3').verbose();
 const fs = require('fs');
 const path = require('path');
+const cors = require('cors');
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 // Database setup
@@ -53,23 +55,27 @@ function auth(req, res, next) {
   }
 }
 
+// Ensure uploads directory exists
+const uploadDir = path.join(__dirname, 'uploads');
+fs.mkdirSync(uploadDir, { recursive: true });
+
 // File upload setup using multer streaming to disk
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, 'uploads'));
+    cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
     const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
     cb(null, unique + path.extname(file.originalname));
   }
 });
-const upload = multer({ storage });
+const upload = multer({ storage, limits: { fileSize: 50 * 1024 * 1024 } });
 
 // Media upload endpoint
 app.post('/api/upload', auth, upload.single('media'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file' });
-  const url = '/uploads/' + req.file.filename;
-  res.json({ url });
+  const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+  res.json({ url: fileUrl });
 });
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
