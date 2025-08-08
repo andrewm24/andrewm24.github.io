@@ -25,6 +25,10 @@
         </div>
         <h1>PokéJournal</h1>
         <p class="tagline">Catch your thoughts &amp; train your focus</p>
+        <p id="user-info" class="user-info hidden">
+          <span id="user-name"></span>
+          <span id="trainer-name"></span>
+        </p>
       </header>
       <img
         id="background-pokemon"
@@ -84,13 +88,47 @@
       </main>
     </div>
   </div>
+codex/fix-formatting-error-on-website
+  <div id="login-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Login</h2>
+      <input type="text" id="username" placeholder="Your name" />
+      <button id="login-btn">Login</button>
+    </div>
+  </div>
+
+  <div id="trainer-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Choose your trainer!</h2>
+      <div class="trainers">
+        <button data-id="red">Red</button>
+        <button data-id="leaf">Leaf</button>
+        <button data-id="ethan">Ethan</button>
+      </div>
+    </div>
+  </div>
+
+
+main
   <div id="starter-modal" class="modal hidden">
     <div class="modal-content">
       <h2>Choose your starter!</h2>
       <div class="starters">
-        <img data-id="1" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png" alt="Bulbasaur" />
-        <img data-id="4" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png" alt="Charmander" />
-        <img data-id="7" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png" alt="Squirtle" />
+        <img
+          data-id="1"
+          src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png"
+          alt="Bulbasaur"
+        />
+        <img
+          data-id="4"
+          src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png"
+          alt="Charmander"
+        />
+        <img
+          data-id="7"
+          src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png"
+          alt="Squirtle"
+        />
       </div>
     </div>
   </div>

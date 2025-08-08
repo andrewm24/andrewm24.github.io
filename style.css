@@ -182,10 +182,12 @@ main > section:nth-of-type(2) {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 3.5rem;
+  font-size: 2rem;
   font-variant-numeric: tabular-nums;
   text-align: center;
   z-index: 4;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
 }
 
 .duration-settings {
@@ -582,6 +584,25 @@ textarea:focus {
   margin: 0 0.5rem;
   cursor: pointer;
   image-rendering: pixelated;
+}
+
+.trainers {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.trainers button {
+  padding: 0.5rem;
+  font-family: 'Press Start 2P', cursive;
+  cursor: pointer;
+  border: 2px solid var(--border);
+  background: var(--card);
+}
+
+.user-info {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
 }
 
 .hidden {
