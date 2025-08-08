@@ -184,6 +184,8 @@ const saveEntry = document.getElementById('save-entry');
 const entriesEl = document.getElementById('entries');
 const mediaPreview = document.getElementById('media-preview');
 const errorEl = document.getElementById('error');
+const searchJournal = document.getElementById('search-journal');
+const exportJournal = document.getElementById('export-journal');
 
 function today() {
   return new Date().toISOString().split('T')[0];
@@ -239,6 +241,35 @@ entryMedia.addEventListener('change', () => {
   mediaPreview.classList.add('show');
 });
 
+searchJournal?.addEventListener('input', renderEntries);
+
+exportJournal?.addEventListener('click', () => {
+  const keys = Object.keys(localStorage).filter(k => k.startsWith('journal-'));
+  if (keys.length === 0) {
+    showToast('No entries to export');
+    return;
+  }
+  const entries = {};
+  keys.forEach(key => {
+    const date = key.replace('journal-', '');
+    const raw = localStorage.getItem(key) || '';
+    try {
+      entries[date] = JSON.parse(raw);
+    } catch (e) {
+      entries[date] = { text: raw };
+    }
+  });
+  const blob = new Blob([JSON.stringify(entries, null, 2)], {
+    type: 'application/json'
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'journal.json';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
 function readFileAsDataURL(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -260,10 +291,12 @@ function afterSave(date) {
 
 function renderEntries() {
   entriesEl.innerHTML = '';
+  const term = searchJournal ? searchJournal.value.toLowerCase() : '';
   const keys = Object.keys(localStorage)
     .filter(k => k.startsWith('journal-'))
     .sort()
     .reverse();
+  let shown = 0;
   keys.forEach(key => {
     const date = key.replace('journal-', '');
     const raw = localStorage.getItem(key) || '';
@@ -276,6 +309,13 @@ function renderEntries() {
     const text = data.text || '';
     const media = data.media;
     const mediaType = data.mediaType;
+    if (
+      term &&
+      !text.toLowerCase().includes(term) &&
+      !formatDate(date).toLowerCase().includes(term)
+    ) {
+      return;
+    }
 
     const entry = document.createElement('div');
     entry.className = 'entry';
@@ -330,7 +370,13 @@ function renderEntries() {
     entry.appendChild(actions);
 
     entriesEl.appendChild(entry);
+    shown++;
   });
+  if (shown === 0) {
+    const empty = document.createElement('p');
+    empty.textContent = 'No entries found.';
+    entriesEl.appendChild(empty);
+  }
 }
 
 entriesEl.addEventListener('click', e => {
@@ -397,6 +443,28 @@ function launchConfetti() {
 const runnerImg = document.getElementById('background-pokemon');
 const capturedEl = document.getElementById('captured');
 const starterModal = document.getElementById('starter-modal');
+const loginModal = document.getElementById('login-modal');
+const usernameInput = document.getElementById('username');
+const loginBtn = document.getElementById('login-btn');
+const trainerModal = document.getElementById('trainer-modal');
+const userInfo = document.getElementById('user-info');
+const userNameEl = document.getElementById('user-name');
+const trainerNameEl = document.getElementById('trainer-name');
+
+const TRAINERS = {
+  red: { name: 'Red' },
+  leaf: { name: 'Leaf' },
+  ethan: { name: 'Ethan' }
+};
+
+let username = localStorage.getItem('username') || '';
+let trainer = localStorage.getItem('trainer') || '';
+
+function updateUserInfo() {
+  if (username) userNameEl.textContent = username;
+  trainerNameEl.textContent = trainer ? ` - ${TRAINERS[trainer]?.name || ''}` : '';
+  if (username || trainer) userInfo.classList.remove('hidden');
+}
 let captured = JSON.parse(localStorage.getItem('captured-pokemon') || '[]').map(p => ({
   id: p.id || null,
   name: p.name,
@@ -408,10 +476,39 @@ let activePokemonIndex = parseInt(localStorage.getItem('active-pokemon-index'), 
 if (isNaN(activePokemonIndex)) activePokemonIndex = null;
 renderCaptured();
 updateRunner();
+updateUserInfo();
 
-if (captured.length === 0 && starterModal) {
-  starterModal.classList.remove('hidden');
+function initModals() {
+  if (!username) {
+    loginModal?.classList.remove('hidden');
+  } else if (!trainer) {
+    trainerModal?.classList.remove('hidden');
+  } else if (captured.length === 0) {
+    starterModal?.classList.remove('hidden');
+  }
 }
+
+initModals();
+
+loginBtn?.addEventListener('click', () => {
+  const name = usernameInput.value.trim();
+  if (!name) return;
+  username = name;
+  localStorage.setItem('username', name);
+  loginModal.classList.add('hidden');
+  updateUserInfo();
+  initModals();
+});
+
+trainerModal?.addEventListener('click', e => {
+  const btn = e.target.closest('[data-id]');
+  if (!btn) return;
+  trainer = btn.dataset.id;
+  localStorage.setItem('trainer', trainer);
+  trainerModal.classList.add('hidden');
+  updateUserInfo();
+  initModals();
+});
 
 starterModal?.addEventListener('click', e => {
   const img = e.target.closest('img[data-id]');
