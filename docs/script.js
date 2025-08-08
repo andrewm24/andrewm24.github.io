@@ -37,9 +37,12 @@ const timeWrapper = document.getElementById('time-wrapper');
 const totalFocusEl = document.getElementById('total-focus');
 const sessionCountEl = document.getElementById('session-count');
 const xpEl = document.getElementById('xp');
+const streakEl = document.getElementById('streak');
 
 let totalFocus = parseInt(localStorage.getItem('total-focus'), 10) || 0;
 let sessionCount = parseInt(localStorage.getItem('session-count'), 10) || 0;
+let streak = parseInt(localStorage.getItem('streak'), 10) || 0;
+let lastFocusDate = localStorage.getItem('last-focus-date');
 
 // Load persistent Pokémon data
 const pokemonXP = JSON.parse(localStorage.getItem('pokemonXP') || '{}');
@@ -54,6 +57,30 @@ function renderStats() {
     const xp = pokemonXP[partnerPokemonId] || 0;
     xpEl.textContent = xp;
   }
+  if (streakEl) streakEl.textContent = streak;
+}
+
+function checkStreak() {
+  const today = new Date().toISOString().split('T')[0];
+  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+  if (lastFocusDate !== today && lastFocusDate !== yesterday) {
+    streak = 0;
+    localStorage.setItem('streak', streak);
+  }
+}
+
+function updateStreak() {
+  const today = new Date().toISOString().split('T')[0];
+  if (lastFocusDate === today) return;
+  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+  if (lastFocusDate === yesterday) {
+    streak += 1;
+  } else {
+    streak = 1;
+  }
+  lastFocusDate = today;
+  localStorage.setItem('streak', streak);
+  localStorage.setItem('last-focus-date', lastFocusDate);
 }
 
 function populateDropdown(select, defaultValue) {
@@ -89,6 +116,9 @@ duration = workDuration;
 remaining = duration;
 totalMs = duration * 1000;
 
+checkStreak();
+renderStats();
+
 function updateDisplay(secRemaining) {
   const mins = String(Math.floor(secRemaining / 60)).padStart(2, '0');
   const secs = String(secRemaining % 60).padStart(2, '0');
@@ -119,6 +149,7 @@ function frame(timestamp) {
       sessionCount += 1;
       localStorage.setItem('total-focus', totalFocus);
       localStorage.setItem('session-count', sessionCount);
+      updateStreak();
       renderStats();
       launchConfetti();
       isBreak = true;
