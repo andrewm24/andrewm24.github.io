@@ -1,9 +1,9 @@
-const CACHE = 'pokejournal-v1';
+const CACHE = 'pokejournal-v3';
 const ASSETS = [
   './',
   './index.html',
-  './style.css',
-  './script.js'
+  './style.css?v=3',
+  './script.js?v=3'
 ];
 
 self.addEventListener('install', evt => {
