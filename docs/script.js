@@ -505,7 +505,24 @@ const TRAINERS = {
 let username = localStorage.getItem('username') || '';
 let trainer = localStorage.getItem('trainer') || '';
 let authToken = localStorage.getItem('token') || '';
-const API_BASE = window.location.hostname === 'localhost' ? '' : 'http://localhost:3000';
+const API_BASE =
+  localStorage.getItem('apiBase') ||
+  (window.location.hostname === 'localhost' ? '' : 'http://localhost:3000');
+
+// Local account store for offline authentication fallback
+const accounts = JSON.parse(localStorage.getItem('accounts') || '{}');
+
+async function hashPassword(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+async function rememberAccount(name, pass) {
+  accounts[name] = await hashPassword(pass);
+  localStorage.setItem('accounts', JSON.stringify(accounts));
+}
 
 function updateUserInfo() {
   if (username) userNameEl.textContent = username;
@@ -649,12 +666,18 @@ registerBtn?.addEventListener('click', async () => {
       body: JSON.stringify({ username: name, password: pass })
     });
     if (res.ok) {
+      await rememberAccount(name, pass);
       showToast('Registered! Please log in.');
     } else {
       showToast('Registration failed');
     }
   } catch {
-    showToast('Server unreachable');
+    if (accounts[name]) {
+      showToast('User exists locally');
+    } else {
+      await rememberAccount(name, pass);
+      showToast('Registered locally');
+    }
   }
 });
 
@@ -674,6 +697,7 @@ loginBtn?.addEventListener('click', async () => {
       localStorage.setItem('token', authToken);
       username = name;
       localStorage.setItem('username', name);
+      await rememberAccount(name, pass);
       loginModal.classList.add('hidden');
       updateUserInfo();
       initModals();
@@ -681,7 +705,19 @@ loginBtn?.addEventListener('click', async () => {
       showToast('Login failed');
     }
   } catch {
-    showToast('Server unreachable');
+    const hash = await hashPassword(pass);
+    if (accounts[name] === hash) {
+      authToken = 'local';
+      localStorage.setItem('token', authToken);
+      username = name;
+      localStorage.setItem('username', name);
+      loginModal.classList.add('hidden');
+      updateUserInfo();
+      initModals();
+      showToast('Logged in offline');
+    } else {
+      showToast('Server unreachable');
+    }
   }
 });
 

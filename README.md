@@ -39,4 +39,6 @@ journal videos to disk, **and** serves the frontend so you can visit
 If you open the static files directly (e.g. via GitHub Pages), the app will
 attempt to contact a backend running on `http://localhost:3000`. You may also
 skip login entirely using the **Skip** button to try the journal in offline
-mode.
+mode. If the backend is unreachable, registration and login fall back to local
+accounts stored in your browser so you can still sign in and have your account
+remembered offline.
