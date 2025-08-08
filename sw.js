@@ -1,4 +1,4 @@
-const CACHE = 'pokejournal-v1';
+const CACHE = 'pokejournal-v2';
 const ASSETS = [
   './',
   './index.html',
