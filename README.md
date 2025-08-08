@@ -42,4 +42,5 @@ attempt to contact a backend running on `http://localhost:3000`. You may also
 skip login entirely using the **Skip** button to try the journal in offline
 mode. If the backend is unreachable, registration and login fall back to local
 accounts stored in your browser so you can still sign in and have your account
-remembered offline.
+remembered offline. Logins check these local accounts first, allowing previously
+saved usernames and passwords to work even when the server cannot be reached.

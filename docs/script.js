@@ -731,6 +731,21 @@ loginBtn?.addEventListener('click', async () => {
   const name = usernameInput.value.trim();
   const pass = passwordInput.value;
   if (!name || !pass) return;
+  const hash = await hashPassword(pass);
+
+  // Try local accounts first so offline logins succeed without a network call
+  if (accounts[name] === hash) {
+    authToken = 'local';
+    localStorage.setItem('token', authToken);
+    username = name;
+    localStorage.setItem('username', name);
+    loginModal.classList.add('hidden');
+    updateUserInfo();
+    initModals();
+    showToast('Logged in offline');
+    return;
+  }
+
   try {
     const res = await fetch(API_BASE + '/api/login', {
       method: 'POST',
@@ -751,19 +766,7 @@ loginBtn?.addEventListener('click', async () => {
       showToast('Login failed');
     }
   } catch {
-    const hash = await hashPassword(pass);
-    if (accounts[name] === hash) {
-      authToken = 'local';
-      localStorage.setItem('token', authToken);
-      username = name;
-      localStorage.setItem('username', name);
-      loginModal.classList.add('hidden');
-      updateUserInfo();
-      initModals();
-      showToast('Logged in offline');
-    } else {
-      showToast('Server unreachable');
-    }
+    showToast('Server unreachable');
   }
 });
 
