@@ -1,3 +1,4 @@
+ qiehxd-codex/fix-formatting-error-on-website
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -68,11 +69,21 @@
       </div>
     </section>
 
-    <section id="pokedex">
-      <h2>Pokédex</h2>
-      <div id="captured"></div>
+      <div class="journal-actions">
+        <input
+          type="text"
+          id="search-journal"
+          placeholder="Search entries..."
+          aria-label="Search journal entries"
+        />
+        <button id="export-journal">Export Journal</button>
+      </div>
+ main
+
+      <div id="entries"></div>
     </section>
 
+ qiehxd-codex/fix-formatting-error-on-website
     <section id="journal">
       <h2>Daily Journal</h2>
       <div class="journal-input">
@@ -141,3 +152,38 @@
   <script src="script.js?v=3"></script>
 </body>
 </html>
+
+  </main>
+</div>
+</div>
+
+<div id="login-modal" class="modal hidden">
+  <div class="modal-content">
+    <h2>Login</h2>
+    <input type="text" id="username" placeholder="Your name" />
+    <button id="login-btn">Login</button>
+  </div>
+</div>
+
+<div id="trainer-modal" class="modal hidden">
+  <div class="modal-content">
+    <h2>Choose your trainer!</h2>
+    <div class="trainers">
+      <button data-id="red">Red</button>
+      <button data-id="leaf">Leaf</button>
+      <button data-id="ethan">Ethan</button>
+    </div>
+  </div>
+</div>
+
+<div id="starter-modal" class="modal hidden">
+  <div class="modal-content">
+    <h2>Choose your starter!</h2>
+    <div class="starters">
+      <img data-id="1" src="..." alt="Bulbasaur" />
+      <img data-id="4" src="..." alt="Charmander" />
+      <img data-id="7" src="..." alt="Squirtle" />
+    </div>
+  </div>
+</div>
+ main
