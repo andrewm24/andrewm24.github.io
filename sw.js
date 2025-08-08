@@ -1,3 +1,10 @@
+const CACHE = 'pokejournal-v4';
+const ASSETS = [
+  './',
+  './index.html',
+  './style.css?v=4',
+  './script.js?v=4'
+
 const CACHE = 'pokejournal-v3';
 const ASSETS = [
   './',

@@ -1,3 +1,15 @@
+// Strip stray branch or merge conflict text that can appear in the DOM
+const strayWalker = document.createTreeWalker(
+  document.documentElement,
+  NodeFilter.SHOW_TEXT
+);
+const strayPattern = /(codex\/|<<<<<<<|=======|>>>>>>)/i;
+let strayNode;
+while ((strayNode = strayWalker.nextNode())) {
+  if (strayPattern.test(strayNode.textContent)) {
+    strayNode.textContent = '';
+  }
+}
 // Strip stray branch text that can appear at the top of the page
 Array.from(document.body.childNodes).forEach(node => {
   if (node.nodeType === Node.TEXT_NODE && /codex\//i.test(node.textContent)) {
