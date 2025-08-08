@@ -11,6 +11,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Serve static frontend files from ../docs so the site loads when the
+// Express server is run directly (e.g. during local development).
+const docsPath = path.join(__dirname, '..', 'docs');
+app.use(express.static(docsPath));
+
 // Database setup
 const db = new sqlite3.Database(path.join(__dirname, 'database.sqlite3'));
 db.run('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, password TEXT)');
@@ -79,6 +84,12 @@ app.post('/api/upload', auth, upload.single('media'), (req, res) => {
 });
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Fallback to index.html for the root path so visiting http://localhost:3000
+// serves the PokéJournal app instead of a blank page.
+app.get('/', (req, res) => {
+  res.sendFile(path.join(docsPath, 'index.html'));
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on ${PORT}`));

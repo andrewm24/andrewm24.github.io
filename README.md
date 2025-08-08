@@ -32,4 +32,6 @@ npm install
 npm start
 ```
 
-This backend persists user credentials in a SQLite database and streams uploaded journal videos to disk, bypassing browser storage limits.
+The server persists user credentials in a SQLite database, streams uploaded
+journal videos to disk, **and** serves the frontend so you can visit
+`http://localhost:3000` to use PokéJournal with authentication enabled.
