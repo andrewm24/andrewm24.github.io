@@ -5,6 +5,7 @@ A minimalist, Pokémon-themed web app that combines a Pomodoro-style timer with 
 ## Features
 
 - Adjustable focus timer with work/break lengths saved between sessions
+- Choose how many 25-minute Pomodoros to tackle, upgrading the Pokéball as your goal increases
 - Journal entries saved by date in `localStorage`
 - Expand, edit, or delete entries later
 - Attach images or videos to journal entries and preview them before saving

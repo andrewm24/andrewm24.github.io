@@ -32,6 +32,8 @@ const pauseBtn = document.getElementById('pause');
 const resetBtn = document.getElementById('reset');
 const workInput = document.getElementById('work-duration');
 const breakInput = document.getElementById('break-duration');
+const sessionGoalInput = document.getElementById('session-goal');
+const timeWrapper = document.getElementById('time-wrapper');
 const totalFocusEl = document.getElementById('total-focus');
 const sessionCountEl = document.getElementById('session-count');
 const xpEl = document.getElementById('xp');
@@ -66,6 +68,7 @@ function populateDropdown(select, defaultValue) {
 
 populateDropdown(workInput, 25);
 populateDropdown(breakInput, 5);
+populateDropdown(sessionGoalInput, 1);
 
 // Load saved durations or fall back to defaults
 const savedWork = parseInt(localStorage.getItem('work-duration'), 10);
@@ -77,6 +80,10 @@ if (!isNaN(savedWork)) {
 if (!isNaN(savedBreak)) {
   breakDuration = savedBreak * 60;
   breakInput.value = savedBreak;
+}
+const savedGoal = parseInt(localStorage.getItem('session-goal'), 10);
+if (!isNaN(savedGoal)) {
+  sessionGoalInput.value = savedGoal;
 }
 duration = workDuration;
 remaining = duration;
@@ -182,9 +189,25 @@ function applyDurations() {
 
 workInput.addEventListener('change', applyDurations);
 breakInput.addEventListener('change', applyDurations);
+function updateBallAppearance() {
+  const count = parseInt(sessionGoalInput.value, 10) || 1;
+  timeWrapper.classList.remove('great-ball', 'ultra-ball', 'master-ball');
+  if (count >= 4) {
+    timeWrapper.classList.add('master-ball');
+  } else if (count >= 3) {
+    timeWrapper.classList.add('ultra-ball');
+  } else if (count >= 2) {
+    timeWrapper.classList.add('great-ball');
+  }
+}
+sessionGoalInput.addEventListener('change', () => {
+  localStorage.setItem('session-goal', sessionGoalInput.value);
+  updateBallAppearance();
+});
 
 updateDisplay(remaining);
 renderStats();
+updateBallAppearance();
 
 // Journal logic
 const entryDate = document.getElementById('entry-date');

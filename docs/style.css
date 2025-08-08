@@ -152,6 +152,18 @@ main > section:nth-of-type(2) {
   background: linear-gradient(to bottom, var(--accent) 50%, #fff 50%);
 }
 
+#time-wrapper.great-ball {
+  background: linear-gradient(to bottom, #0070ca 50%, #fff 50%);
+}
+
+#time-wrapper.ultra-ball {
+  background: linear-gradient(to bottom, #3b3b3b 50%, #fff 50%);
+}
+
+#time-wrapper.master-ball {
+  background: linear-gradient(to bottom, #6a2ab0 50%, #fff 50%);
+}
+
 #time-wrapper::before {
   content: '';
   position: absolute;
