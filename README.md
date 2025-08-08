@@ -35,3 +35,8 @@ npm start
 The server persists user credentials in a SQLite database, streams uploaded
 journal videos to disk, **and** serves the frontend so you can visit
 `http://localhost:3000` to use PokéJournal with authentication enabled.
+
+If you open the static files directly (e.g. via GitHub Pages), the app will
+attempt to contact a backend running on `http://localhost:3000`. You may also
+skip login entirely using the **Skip** button to try the journal in offline
+mode.

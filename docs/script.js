@@ -287,7 +287,7 @@ async function uploadMedia(file) {
   const form = new FormData();
   form.append('media', file);
   const headers = authToken ? { Authorization: 'Bearer ' + authToken } : {};
-  const res = await fetch('/api/upload', { method: 'POST', body: form, headers });
+  const res = await fetch(API_BASE + '/api/upload', { method: 'POST', body: form, headers });
   if (!res.ok) throw new Error('Upload failed');
   const data = await res.json();
   return data.url;
@@ -473,6 +473,7 @@ const usernameInput = document.getElementById('username');
 const passwordInput = document.getElementById('password');
 const loginBtn = document.getElementById('login-btn');
 const registerBtn = document.getElementById('register-btn');
+const skipLoginBtn = document.getElementById('skip-login');
 const trainerModal = document.getElementById('trainer-modal');
 const userInfo = document.getElementById('user-info');
 const userNameEl = document.getElementById('user-name');
@@ -504,6 +505,7 @@ const TRAINERS = {
 let username = localStorage.getItem('username') || '';
 let trainer = localStorage.getItem('trainer') || '';
 let authToken = localStorage.getItem('token') || '';
+const API_BASE = window.location.hostname === 'localhost' ? '' : 'http://localhost:3000';
 
 function updateUserInfo() {
   if (username) userNameEl.textContent = username;
@@ -640,15 +642,19 @@ registerBtn?.addEventListener('click', async () => {
   const name = usernameInput.value.trim();
   const pass = passwordInput.value;
   if (!name || !pass) return;
-  const res = await fetch('/api/register', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: name, password: pass })
-  });
-  if (res.ok) {
-    showToast('Registered! Please log in.');
-  } else {
-    showToast('Registration failed');
+  try {
+    const res = await fetch(API_BASE + '/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: name, password: pass })
+    });
+    if (res.ok) {
+      showToast('Registered! Please log in.');
+    } else {
+      showToast('Registration failed');
+    }
+  } catch {
+    showToast('Server unreachable');
   }
 });
 
@@ -656,22 +662,26 @@ loginBtn?.addEventListener('click', async () => {
   const name = usernameInput.value.trim();
   const pass = passwordInput.value;
   if (!name || !pass) return;
-  const res = await fetch('/api/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: name, password: pass })
-  });
-  const data = await res.json().catch(() => ({}));
-  if (res.ok && data.token) {
-    authToken = data.token;
-    localStorage.setItem('token', authToken);
-    username = name;
-    localStorage.setItem('username', name);
-    loginModal.classList.add('hidden');
-    updateUserInfo();
-    initModals();
-  } else {
-    showToast('Login failed');
+  try {
+    const res = await fetch(API_BASE + '/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: name, password: pass })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data.token) {
+      authToken = data.token;
+      localStorage.setItem('token', authToken);
+      username = name;
+      localStorage.setItem('username', name);
+      loginModal.classList.add('hidden');
+      updateUserInfo();
+      initModals();
+    } else {
+      showToast('Login failed');
+    }
+  } catch {
+    showToast('Server unreachable');
   }
 });
 
@@ -716,6 +726,14 @@ setPartnerBtn?.addEventListener('click', () => {
   ensureStarterCaptured();
   updatePartnerDisplay();
   pokemonModal.classList.add('hidden');
+});
+
+skipLoginBtn?.addEventListener('click', () => {
+  username = 'Guest';
+  localStorage.setItem('username', username);
+  loginModal.classList.add('hidden');
+  updateUserInfo();
+  initModals();
 });
 
 fetch('pokemon-data.json')
