@@ -14,7 +14,7 @@
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Press+Start+2P&display=swap"
     rel="stylesheet"
   />
-  <link rel="stylesheet" href="style.css?v=11" />
+  <link rel="stylesheet" href="style.css?v=12" />
 </head>
 <body>
   <div class="pokedex">
@@ -38,6 +38,15 @@
           </div>
         </div>
         <button id="open-pokedex">Pokédex</button>
+        <button id="open-trainer-card">Trainer Card</button>
+        <button id="open-xp-log">XP Log</button>
+        <select id="theme-select" aria-label="Theme">
+          <option value="fire">Fire</option>
+          <option value="water">Water</option>
+          <option value="electric">Electric</option>
+          <option value="grass">Grass</option>
+          <option value="psychic">Psychic</option>
+        </select>
       </header>
       <img
         id="background-pokemon"
@@ -79,6 +88,14 @@
         <p>XP: <span id="xp">0</span></p>
         <p>Streak: <span id="streak">0</span> days</p>
       </div>
+      <div id="goal-settings" class="goal-settings">
+        <label>Daily Goal (min)
+          <input type="number" id="daily-goal" min="10" step="5" />
+        </label>
+        <div class="goal-progress"><div id="goal-bar"></div></div>
+        <p id="goal-percent">0%</p>
+      </div>
+      <div id="heatmap" class="heatmap"></div>
       <canvas id="focusChart"></canvas>
       <div id="focus-summary" class="focus-summary"></div>
     </section>
@@ -89,6 +106,13 @@
         <input type="date" id="entry-date" />
         <textarea id="entry-text" placeholder="Write your reflection..."></textarea>
         <p id="word-count" class="word-count">0 words</p>
+        <div id="mood-selector" class="mood-selector">
+          <span data-mood="😄">😄</span>
+          <span data-mood="🙂">🙂</span>
+          <span data-mood="😐">😐</span>
+          <span data-mood="☹️">☹️</span>
+          <span data-mood="😠">😠</span>
+        </div>
         <input type="text" id="entry-tags" placeholder="Tags (comma-separated)" />
         <input type="file" id="entry-media" accept="image/*,video/*" />
         <div id="media-preview" class="media-preview" aria-hidden="true"></div>
@@ -103,10 +127,13 @@
           placeholder="Search entries..."
           aria-label="Search journal entries"
         />
+        <select id="tag-filter"><option value="">All Tags</option></select>
         <button id="export-journal">Export Journal</button>
+        <button id="export-data">Export Data</button>
         <button id="import-journal">Import Journal</button>
         <input type="file" id="import-file" accept="application/json" hidden />
       </div>
+      <canvas id="moodChart"></canvas>
       <div id="entries"></div>
     </section>
       </main>
@@ -159,6 +186,29 @@
     </div>
   </div>
 
+  <div id="trainer-card-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Trainer Card</h2>
+      <div id="badge-grid" class="grid"></div>
+    </div>
+  </div>
+
+  <div id="xp-log-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>XP Log</h2>
+      <div id="xp-log-list" class="log"></div>
+    </div>
+  </div>
+
+  <div id="goal-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Goal Reached!</h2>
+      <img id="goal-gif" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png" alt="celebrate" />
+      <p>Bonus +50 XP</p>
+      <button id="goal-close">Close</button>
+    </div>
+  </div>
+
   <div id="pokedex-modal" class="modal hidden">
     <div class="modal-content">
       <h2>Your Pokémon</h2>
@@ -179,6 +229,7 @@
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="script.js?v=11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="script.js?v=12"></script>
 </body>
 </html>

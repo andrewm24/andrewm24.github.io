@@ -50,6 +50,39 @@ const capturedPokemon = JSON.parse(localStorage.getItem('capturedPokemon') || '[
 let partnerPokemonId = localStorage.getItem('partnerPokemonId');
 let pokemonData = [];
 
+const pokemonSources = JSON.parse(localStorage.getItem('pokemonSources') || '{}');
+const badgeDefs = {
+  firstPomodoro: 'First Pomodoro',
+  threeDayStreak: '3-Day Streak',
+  hundredMinutes: '100 Minutes Total',
+  firstJournal: 'First Journal Entry',
+  fullyEvolved: 'Fully Evolved Pokémon',
+  nightOwl: 'Night Owl'
+};
+let badges = JSON.parse(localStorage.getItem('badges') || '{}');
+const xpLog = JSON.parse(localStorage.getItem('xpLog') || '[]');
+
+const dailyGoalInput = document.getElementById('daily-goal');
+if (dailyGoalInput) dailyGoalInput.value = parseInt(localStorage.getItem('dailyGoal'), 10) || 60;
+const goalBar = document.getElementById('goal-bar');
+const goalPercent = document.getElementById('goal-percent');
+const goalModal = document.getElementById('goal-modal');
+const goalClose = document.getElementById('goal-close');
+const heatmapEl = document.getElementById('heatmap');
+const moodSelector = document.getElementById('mood-selector');
+const moodChartEl = document.getElementById('moodChart');
+const tagFilter = document.getElementById('tag-filter');
+const exportDataBtn = document.getElementById('export-data');
+const trainerCardBtn = document.getElementById('open-trainer-card');
+const trainerCardModal = document.getElementById('trainer-card-modal');
+const badgeGrid = document.getElementById('badge-grid');
+const xpLogBtn = document.getElementById('open-xp-log');
+const xpLogModal = document.getElementById('xp-log-modal');
+const xpLogList = document.getElementById('xp-log-list');
+const themeSelect = document.getElementById('theme-select');
+
+let selectedMood = null;
+
 // Track focused minutes per day in localStorage
 function getFocusStats() {
   return JSON.parse(localStorage.getItem('focusStats') || '{}');
@@ -61,6 +94,8 @@ function saveFocusMinutes(mins) {
   const today = new Date().toISOString().split('T')[0];
   stats[today] = (stats[today] || 0) + mins;
   localStorage.setItem('focusStats', JSON.stringify(stats));
+  renderGoal();
+  renderHeatmap();
 }
 
 let focusChart;
@@ -201,6 +236,12 @@ checkStreak();
 renderStats();
 renderChart();
 renderStatsSummary();
+renderGoal();
+renderHeatmap();
+renderMoodChart();
+populateTags();
+applyTheme();
+scheduleReminder();
 
 function updateDisplay(secRemaining) {
   const mins = String(Math.floor(secRemaining / 60)).padStart(2, '0');
@@ -226,13 +267,16 @@ function frame(timestamp) {
     paused = true;
     timeEl.classList.add('complete');
     if (!isBreak) {
-      addXP(partnerPokemonId, 10);
+      addXP(partnerPokemonId, 10, 'pomodoro');
       const gained = workDuration / 60;
       totalFocus += gained;
       sessionCount += 1;
       localStorage.setItem('total-focus', totalFocus);
       localStorage.setItem('session-count', sessionCount);
       updateStreak();
+      checkBadges();
+      if (new Date().getHours() >= 0 && new Date().getHours() < 6)
+        awardBadge('nightOwl');
       renderStats();
       saveFocusMinutes(gained);
       renderChart();
@@ -382,6 +426,10 @@ function loadEntry() {
   entryTags.value = Array.isArray(data?.tags)
     ? data.tags.join(', ')
     : data?.tags || '';
+  selectedMood = data?.mood || null;
+  Array.from(moodSelector?.children || []).forEach(el =>
+    el.classList.toggle('active', el.dataset.mood === selectedMood)
+  );
   entryMedia.value = '';
   mediaPreview.innerHTML = '';
   mediaPreview.classList.remove('show');
@@ -440,10 +488,11 @@ saveEntry.addEventListener('click', async () => {
       mediaType = existing.mediaType;
     }
 
-    const entryObj = { text, tags, media, mediaType };
+    const entryObj = { text, tags, media, mediaType, mood: selectedMood };
     localStorage.setItem('journal-' + date, JSON.stringify(entryObj));
     afterSave(date);
-    addXP(partnerPokemonId, 5);
+    addXP(partnerPokemonId, 5, 'journal');
+    awardBadge('firstJournal');
   } catch (err) {
     errorEl.textContent = 'Could not save media: ' + err.message;
   }
@@ -580,7 +629,13 @@ function afterSave(date) {
   uploadProgress.classList.remove('show');
   localStorage.removeItem('draft-' + date);
   updateWordCount();
+  selectedMood = null;
+  Array.from(moodSelector?.children || []).forEach(el =>
+    el.classList.remove('active')
+  );
   renderEntries();
+  renderMoodChart();
+  populateTags();
   const saved = entriesEl.querySelector(`.entry[data-date="${date}"]`);
   if (saved) saved.classList.add('expanded');
 }
@@ -588,6 +643,7 @@ function afterSave(date) {
 function renderEntries() {
   entriesEl.innerHTML = '';
   const term = searchJournal ? searchJournal.value.toLowerCase() : '';
+  const tagSel = tagFilter ? tagFilter.value : '';
   const keys = Object.keys(localStorage)
     .filter(k => k.startsWith('journal-'))
     .sort()
@@ -607,10 +663,11 @@ function renderEntries() {
     const mediaType = data.mediaType;
     const tags = data.tags || [];
     if (
-      term &&
-      !text.toLowerCase().includes(term) &&
-      !formatDate(date).toLowerCase().includes(term) &&
-      !tags.some(t => t.toLowerCase().includes(term))
+      (term &&
+        !text.toLowerCase().includes(term) &&
+        !formatDate(date).toLowerCase().includes(term) &&
+        !tags.some(t => t.toLowerCase().includes(term))) ||
+      (tagSel && !tags.includes(tagSel))
     ) {
       return;
     }
@@ -634,6 +691,13 @@ function renderEntries() {
     full.className = 'full';
     full.textContent = text;
     entry.appendChild(full);
+
+    if (data.mood) {
+      const moodEl = document.createElement('div');
+      moodEl.className = 'mood';
+      moodEl.textContent = data.mood;
+      entry.appendChild(moodEl);
+    }
 
     if (media) {
       const mediaWrap = document.createElement('div');
@@ -703,6 +767,10 @@ entriesEl.addEventListener('click', e => {
     }
     entryText.value = data.text || '';
     entryTags.value = (data.tags || []).join(', ');
+    selectedMood = data.mood || null;
+    Array.from(moodSelector?.children || []).forEach(el =>
+      el.classList.toggle('active', el.dataset.mood === selectedMood)
+    );
     updateWordCount();
     entryText.focus();
     entryMedia.value = '';
@@ -742,6 +810,173 @@ function formatDate(str) {
 }
 
 renderEntries();
+
+// XP log helper
+function logXP(amount, cause) {
+  xpLog.push({ time: new Date().toISOString(), amount, cause });
+  localStorage.setItem('xpLog', JSON.stringify(xpLog));
+}
+
+function renderXPLog() {
+  if (!xpLogList) return;
+  xpLogList.innerHTML = '';
+  xpLog
+    .slice()
+    .reverse()
+    .forEach(e => {
+      const div = document.createElement('div');
+      div.textContent = `${e.time} - ${e.cause}: +${e.amount} XP`;
+      xpLogList.appendChild(div);
+    });
+}
+
+function renderBadges() {
+  if (!badgeGrid) return;
+  badgeGrid.innerHTML = '';
+  Object.keys(badgeDefs).forEach(id => {
+    const div = document.createElement('div');
+    div.className = 'badge' + (badges[id] ? ' earned' : '');
+    div.textContent = badgeDefs[id];
+    badgeGrid.appendChild(div);
+  });
+}
+
+function awardBadge(id) {
+  if (badges[id]) return;
+  badges[id] = true;
+  localStorage.setItem('badges', JSON.stringify(badges));
+  showToast(`Badge earned: ${badgeDefs[id]}`);
+  renderBadges();
+}
+
+function checkBadges() {
+  if (sessionCount === 1) awardBadge('firstPomodoro');
+  if (streak >= 3) awardBadge('threeDayStreak');
+  if (totalFocus >= 100) awardBadge('hundredMinutes');
+  if (getLevel(pokemonXP[partnerPokemonId] || 0) >= 10)
+    awardBadge('fullyEvolved');
+}
+
+function renderGoal() {
+  if (!dailyGoalInput) return;
+  const goal = parseInt(dailyGoalInput.value, 10) || 60;
+  localStorage.setItem('dailyGoal', goal);
+  const today = new Date().toISOString().split('T')[0];
+  const progress = getFocusStats()[today] || 0;
+  const pct = Math.min((progress / goal) * 100, 100);
+  goalBar.style.width = pct + '%';
+  goalPercent.textContent = Math.floor(pct) + '%';
+  if (progress >= goal && localStorage.getItem('goalBonusDate') !== today) {
+    addXP(partnerPokemonId, 50, 'goal');
+    localStorage.setItem('goalBonusDate', today);
+    goalModal.classList.remove('hidden');
+  }
+}
+
+function renderHeatmap() {
+  if (!heatmapEl) return;
+  const stats = getFocusStats();
+  const today = new Date();
+  heatmapEl.innerHTML = '';
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(today.getTime() - i * 86400000)
+      .toISOString()
+      .split('T')[0];
+    const val = stats[d] || 0;
+    const box = document.createElement('div');
+    box.className = 'heat-box';
+    box.style.opacity = Math.min(val / 60, 1);
+    heatmapEl.appendChild(box);
+  }
+}
+
+let moodChart;
+function renderMoodChart() {
+  if (!moodChartEl || typeof Chart === 'undefined') return;
+  const keys = Object.keys(localStorage)
+    .filter(k => k.startsWith('journal-'))
+    .sort()
+    .slice(-7);
+  const labels = [];
+  const data = [];
+  keys.forEach(k => {
+    const date = k.replace('journal-', '');
+    const entry = JSON.parse(localStorage.getItem(k) || '{}');
+    if (entry.mood) {
+      labels.push(date);
+      data.push(moodValue(entry.mood));
+    }
+  });
+  if (moodChart) moodChart.destroy();
+  moodChart = new Chart(moodChartEl.getContext('2d'), {
+    type: 'line',
+    data: { labels, datasets: [{ label: 'Mood', data }] },
+    options: {
+      scales: {
+        y: {
+          min: 1,
+          max: 5,
+          ticks: {
+            callback: v => moodFromValue(v)
+          }
+        }
+      }
+    }
+  });
+}
+
+function moodValue(m) {
+  return ['😠', '☹️', '😐', '🙂', '😄'].indexOf(m) + 1;
+}
+function moodFromValue(v) {
+  return ['😠', '☹️', '😐', '🙂', '😄'][v - 1];
+}
+
+function populateTags() {
+  if (!tagFilter) return;
+  const tags = new Set();
+  Object.keys(localStorage)
+    .filter(k => k.startsWith('journal-'))
+    .forEach(k => {
+      const entry = JSON.parse(localStorage.getItem(k) || '{}');
+      (entry.tags || []).forEach(t => tags.add(t));
+    });
+  const current = tagFilter.value;
+  tagFilter.innerHTML = '<option value="">All Tags</option>';
+  Array.from(tags).forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t;
+    opt.textContent = t;
+    tagFilter.appendChild(opt);
+  });
+  tagFilter.value = current;
+}
+
+function applyTheme() {
+  if (!themeSelect) return;
+  const theme = themeSelect.value || localStorage.getItem('theme') || 'fire';
+  document.body.className = document.body.className.replace(/theme-\w+/g, '');
+  document.body.classList.add('theme-' + theme);
+  themeSelect.value = theme;
+  localStorage.setItem('theme', theme);
+}
+
+function checkReminder() {
+  const today = new Date().toISOString().split('T')[0];
+  if ((getFocusStats()[today] || 0) === 0) {
+    alert('No focus yet today! Keep your streak going!');
+  }
+  scheduleReminder();
+}
+
+function scheduleReminder() {
+  const now = new Date();
+  const target = new Date();
+  target.setHours(20, 0, 0, 0);
+  let delay = target - now;
+  if (delay < 0) delay += 86400000;
+  setTimeout(checkReminder, delay);
+}
 
 function launchConfetti() {
   for (let i = 0; i < 20; i++) {
@@ -839,13 +1074,21 @@ function ensureStarterCaptured() {
   }
 }
 
-function addXP(id, amount) {
+function addXP(id, amount, source) {
   if (!id) return;
   pokemonXP[id] = (pokemonXP[id] || 0) + amount;
   localStorage.setItem('pokemonXP', JSON.stringify(pokemonXP));
+  const src = pokemonSources[id] || { pomodoros: 0, journals: 0, goal: 0 };
+  if (source === 'pomodoro') src.pomodoros++;
+  if (source === 'journal') src.journals++;
+  if (source === 'goal') src.goal++;
+  pokemonSources[id] = src;
+  localStorage.setItem('pokemonSources', JSON.stringify(pokemonSources));
+  logXP(amount, source);
   updatePartnerDisplay();
   renderPokedex();
   checkCapture();
+  checkBadges();
 }
 
 function checkCapture() {
@@ -896,7 +1139,8 @@ function openPokemonModal(id) {
   modalType.textContent = `Type: ${data.type}`;
   modalDesc.textContent = data.description;
   modalLevel.textContent = `Level: ${level}`;
-  modalXp.textContent = `XP: ${xp}`;
+  const src = pokemonSources[id] || { pomodoros: 0, journals: 0, goal: 0 };
+  modalXp.textContent = `XP: ${xp} (Pomodoros: ${src.pomodoros}, Journals: ${src.journals}, Goals: ${src.goal})`;
   const next = levelThreshold(level + 1);
   const cur = levelThreshold(level);
   const progress = Math.min((xp - cur) / (next - cur), 1);
@@ -1037,6 +1281,60 @@ openPokedexBtn?.addEventListener('click', () => {
   pokedexModal.classList.remove('hidden');
   renderPokedex();
 });
+
+trainerCardBtn?.addEventListener('click', () => {
+  trainerCardModal.classList.remove('hidden');
+  renderBadges();
+});
+
+trainerCardModal?.addEventListener('click', e => {
+  if (e.target === trainerCardModal) trainerCardModal.classList.add('hidden');
+});
+
+xpLogBtn?.addEventListener('click', () => {
+  renderXPLog();
+  xpLogModal.classList.remove('hidden');
+});
+
+xpLogModal?.addEventListener('click', e => {
+  if (e.target === xpLogModal) xpLogModal.classList.add('hidden');
+});
+
+goalClose?.addEventListener('click', () => goalModal.classList.add('hidden'));
+
+dailyGoalInput?.addEventListener('change', renderGoal);
+tagFilter?.addEventListener('change', renderEntries);
+moodSelector?.addEventListener('click', e => {
+  const span = e.target.closest('[data-mood]');
+  if (!span) return;
+  selectedMood = span.dataset.mood;
+  Array.from(moodSelector.children).forEach(el =>
+    el.classList.toggle('active', el === span)
+  );
+});
+
+exportDataBtn?.addEventListener('click', () => {
+  const zip = new JSZip();
+  const stats = getFocusStats();
+  const csv = 'date,minutes\n' +
+    Object.entries(stats).map(([d, m]) => `${d},${m}`).join('\n');
+  zip.file('focus.csv', csv);
+  const entries = {};
+  Object.keys(localStorage)
+    .filter(k => k.startsWith('journal-'))
+    .forEach(k => (entries[k.replace('journal-', '')] = JSON.parse(localStorage.getItem(k))));
+  zip.file('journal.json', JSON.stringify(entries, null, 2));
+  zip.generateAsync({ type: 'blob' }).then(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'pokejournal.zip';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+});
+
+themeSelect?.addEventListener('change', applyTheme);
 
 pokedexModal?.addEventListener('click', e => {
   if (e.target === pokedexModal) pokedexModal.classList.add('hidden');

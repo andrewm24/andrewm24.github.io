@@ -18,6 +18,11 @@ A minimalist, Pokémon-themed web app that combines a Pomodoro-style timer with 
 - Earn XP for each focus session (+10) and journal entry (+5) to level Pokémon
 - Capture new Pokémon for your Pokédex as total XP milestones are met
 - Search journal entries and export or import them as JSON
+- Set daily focus goals with progress bars and bonus XP on completion
+- Earn badges for milestones and review them on your Trainer Card
+- Track moods on journal entries and visualize trends
+- Filter journal entries by tag and export focus stats plus journal data as a zip
+- View a detailed XP log and switch themes based on Pokémon types
 - Tag entries and filter by tag
 - Upload large videos (up to 500 MB) with a progress bar when the backend is running
 - Log daily focused minutes and view a 7‑day focus chart with summary stats
