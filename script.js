@@ -1,6 +1,6 @@
 // Strip stray branch or merge conflict text that can appear in the DOM
 const strayWalker = document.createTreeWalker(
-  document.body,
+  document.documentElement,
   NodeFilter.SHOW_TEXT
 );
 const strayPattern = /(codex\/|<<<<<<<|=======|>>>>>>)/i;
