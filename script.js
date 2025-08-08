@@ -1,3 +1,10 @@
+// Strip stray branch text that can appear at the top of the page
+Array.from(document.body.childNodes).forEach(node => {
+  if (node.nodeType === Node.TEXT_NODE && /codex\//i.test(node.textContent)) {
+    node.remove();
+  }
+});
+
 // Timer logic
 let workDuration = 25 * 60;
 let breakDuration = 5 * 60;
@@ -517,7 +524,7 @@ starterModal?.addEventListener('click', e => {
   chooseStarter(id);
 });
 
-capturedEl.addEventListener('click', e => {
+capturedEl?.addEventListener('click', e => {
   const img = e.target.closest('img');
   if (!img) return;
   const index = parseInt(img.dataset.index, 10);
