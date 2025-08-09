@@ -1,3 +1,27 @@
+// Firebase and Firestore imports
+import {
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword
+} from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
+import {
+  doc,
+  setDoc,
+  getDoc,
+  getDocs,
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  limit,
+  increment,
+  serverTimestamp,
+  runTransaction
+} from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+import { auth, db } from './firebase-init.js';
+
 // Strip stray branch or merge conflict text that can appear in the DOM
 const strayWalker = document.createTreeWalker(
   document.documentElement,
@@ -10,6 +34,9 @@ while ((strayNode = strayWalker.nextNode())) {
     strayNode.textContent = '';
   }
 }
+
+let currentUser = null; // Firebase auth user
+let sessionKey = null; // Cached journal encryption key
 
 // Timer logic
 let workDuration = 25 * 60;
@@ -83,28 +110,55 @@ const themeSelect = document.getElementById('theme-select');
 
 let selectedMood = null;
 
-// Track focused minutes per day in localStorage
-function getFocusStats() {
-  return JSON.parse(localStorage.getItem('focusStats') || '{}');
+// Fetch focus statistics from Firestore for the signed-in user
+async function getFocusStats(range = 30) {
+  if (!currentUser) {
+    const local = JSON.parse(localStorage.getItem('focusStats') || '{}');
+    return local;
+  }
+  const statsRef = collection(db, 'users', currentUser.uid, 'stats');
+  const q = query(statsRef, orderBy('__name__'), limit(range));
+  const snap = await getDocs(q);
+  const stats = {};
+  snap.forEach(d => (stats[d.id] = d.data().minutes || 0));
+  return stats;
 }
 
-// Save minutes to today's total and persist
-function saveFocusMinutes(mins) {
-  const stats = getFocusStats();
-  const today = new Date().toISOString().split('T')[0];
-  stats[today] = (stats[today] || 0) + mins;
-  localStorage.setItem('focusStats', JSON.stringify(stats));
+// Atomically store focused minutes and append to the XP log
+async function saveFocusMinutes(date, mins) {
+  if (currentUser) {
+    const statsRef = doc(db, 'users', currentUser.uid, 'stats', date);
+    await setDoc(
+      statsRef,
+      { minutes: increment(mins), sessions: increment(1), xpGained: increment(mins) },
+      { merge: true }
+    );
+    await addDoc(collection(db, 'users', currentUser.uid, 'xpLog'), {
+      delta: mins,
+      reason: 'focus',
+      timestamp: serverTimestamp()
+    });
+    await gainXp(partnerPokemonId, mins);
+  } else {
+    const stats = JSON.parse(localStorage.getItem('focusStats') || '{}');
+    stats[date] = (stats[date] || 0) + mins;
+    localStorage.setItem('focusStats', JSON.stringify(stats));
+  }
   renderGoal();
   renderHeatmap();
+  const stats = await getFocusStats(7);
+  renderFocusChart(stats);
+  renderStatsSummary(stats);
+  streak = await getStreak();
+  renderStats();
 }
 
 let focusChart;
 
-// Render a bar chart for the last 7 days of focus data
-function renderChart() {
+// Plot a chart of focused minutes using Chart.js
+function renderFocusChart(stats) {
   const chartEl = document.getElementById('focusChart');
   if (!chartEl || typeof Chart === 'undefined') return;
-  const stats = getFocusStats();
   const labels = Object.keys(stats).sort().slice(-7);
   const data = labels.map(d => stats[d]);
   if (focusChart) focusChart.destroy();
@@ -113,17 +167,11 @@ function renderChart() {
     data: {
       labels,
       datasets: [
-        {
-          label: 'Minutes',
-          data,
-          backgroundColor: 'rgba(255,99,132,0.8)'
-        }
+        { label: 'Minutes', data, backgroundColor: 'rgba(255,99,132,0.8)' }
       ]
     },
     options: {
-      plugins: {
-        title: { display: true, text: 'Minutes Focused' }
-      },
+      plugins: { title: { display: true, text: 'Minutes Focused' } },
       scales: {
         x: { title: { display: true, text: 'Date' } },
         y: { beginAtZero: true, title: { display: true, text: 'Minutes' } }
@@ -132,11 +180,10 @@ function renderChart() {
   });
 }
 
-// Render summary stats: total minutes, best day, and streak
-function renderStatsSummary() {
+// Show total minutes, best day, and current streak
+function renderStatsSummary(stats) {
   const summaryEl = document.getElementById('focus-summary');
   if (!summaryEl) return;
-  const stats = getFocusStats();
   const entries = Object.entries(stats);
   const total = entries.reduce((sum, [, v]) => sum + v, 0);
   let bestDay = 'N/A';
@@ -147,17 +194,11 @@ function renderStatsSummary() {
       bestDay = day;
     }
   }
-  const today = new Date();
+  const dates = Object.keys(stats).sort().reverse();
   let streakCount = 0;
-  for (let i = 0; ; i++) {
-    const d = new Date(today.getTime() - i * 86400000)
-      .toISOString()
-      .split('T')[0];
-    if (stats[d]) {
-      streakCount++;
-    } else {
-      break;
-    }
+  for (const d of dates) {
+    if (stats[d] > 0) streakCount++;
+    else break;
   }
   summaryEl.innerHTML = `
     <p>Total Minutes: ${total}</p>
@@ -166,11 +207,15 @@ function renderStatsSummary() {
   `;
 }
 
-function renderStats() {
+async function renderStats() {
   if (totalFocusEl) totalFocusEl.textContent = totalFocus;
   if (sessionCountEl) sessionCountEl.textContent = sessionCount;
   if (xpEl) {
-    const xp = pokemonXP[partnerPokemonId] || 0;
+    let xp = pokemonXP[partnerPokemonId] || 0;
+    if (currentUser && partnerPokemonId) {
+      const snap = await getDoc(doc(db, 'users', currentUser.uid, 'pokedex', String(partnerPokemonId)));
+      if (snap.exists()) xp = snap.data().xp || 0;
+    }
     xpEl.textContent = xp;
   }
   if (streakEl) streakEl.textContent = streak;
@@ -234,8 +279,10 @@ totalMs = duration * 1000;
 
 checkStreak();
 renderStats();
-renderChart();
-renderStatsSummary();
+getFocusStats(7).then(stats => {
+  renderFocusChart(stats);
+  renderStatsSummary(stats);
+});
 renderGoal();
 renderHeatmap();
 renderMoodChart();
@@ -267,7 +314,7 @@ function frame(timestamp) {
     paused = true;
     timeEl.classList.add('complete');
     if (!isBreak) {
-      addXP(partnerPokemonId, 10, 'pomodoro');
+      gainXp(partnerPokemonId, 10);
       const gained = workDuration / 60;
       totalFocus += gained;
       sessionCount += 1;
@@ -278,9 +325,8 @@ function frame(timestamp) {
       if (new Date().getHours() >= 0 && new Date().getHours() < 6)
         awardBadge('nightOwl');
       renderStats();
-      saveFocusMinutes(gained);
-      renderChart();
-      renderStatsSummary();
+      const today = new Date().toISOString().split('T')[0];
+      saveFocusMinutes(today, gained);
       launchConfetti();
       isBreak = true;
       duration = breakDuration;
@@ -471,28 +517,20 @@ saveEntry.addEventListener('click', async () => {
   errorEl.textContent = '';
   if (!date || (!text && !file)) return;
 
-  let media, mediaType;
+  let media;
   try {
     if (file) {
       if (file.type.startsWith('video') || file.size > 5 * 1024 * 1024) {
-        if (!authToken) throw new Error('Login required for large files');
+        if (!authToken && currentUser) throw new Error('Login required for large files');
         media = await uploadMedia(file);
-        mediaType = file.type;
       } else {
         media = await readFileAsDataURL(file);
-        mediaType = file.type;
       }
     } else {
       const existing = JSON.parse(localStorage.getItem('journal-' + date) || '{}');
       media = existing.media;
-      mediaType = existing.mediaType;
     }
-
-    const entryObj = { text, tags, media, mediaType, mood: selectedMood };
-    localStorage.setItem('journal-' + date, JSON.stringify(entryObj));
-    afterSave(date);
-    addXP(partnerPokemonId, 5, 'journal');
-    awardBadge('firstJournal');
+    await saveJournalEntry(date, text, selectedMood, tags, media ? [media] : []);
   } catch (err) {
     errorEl.textContent = 'Could not save media: ' + err.message;
   }
@@ -867,7 +905,7 @@ function renderGoal() {
   goalBar.style.width = pct + '%';
   goalPercent.textContent = Math.floor(pct) + '%';
   if (progress >= goal && localStorage.getItem('goalBonusDate') !== today) {
-    addXP(partnerPokemonId, 50, 'goal');
+    gainXp(partnerPokemonId, 50);
     localStorage.setItem('goalBonusDate', today);
     goalModal.classList.remove('hidden');
   }
@@ -992,10 +1030,11 @@ function launchConfetti() {
 const runnerImg = document.getElementById('background-pokemon');
 const starterModal = document.getElementById('starter-modal');
 const loginModal = document.getElementById('login-modal');
-const usernameInput = document.getElementById('username');
+const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
-const loginBtn = document.getElementById('login-btn');
-const registerBtn = document.getElementById('register-btn');
+const emailLoginBtn = document.getElementById('email-login');
+const emailRegisterBtn = document.getElementById('email-register');
+const googleLoginBtn = document.getElementById('google-login');
 const skipLoginBtn = document.getElementById('skip-login');
 const trainerModal = document.getElementById('trainer-modal');
 const userInfo = document.getElementById('user-info');
@@ -1032,25 +1071,11 @@ const API_BASE =
   localStorage.getItem('apiBase') ||
   (window.location.hostname === 'localhost' ? '' : 'http://localhost:3000');
 
-// Local account store for offline authentication fallback
-const accounts = JSON.parse(localStorage.getItem('accounts') || '{}');
-
-async function hashPassword(str) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf))
-    .map(b => b.toString(16).padStart(2, '0'))
-    .join('');
-}
-
-async function rememberAccount(name, pass) {
-  accounts[name] = await hashPassword(pass);
-  localStorage.setItem('accounts', JSON.stringify(accounts));
-}
-
 function updateUserInfo() {
-  if (username) userNameEl.textContent = username;
+  const display = username || currentUser?.displayName || '';
+  if (display) userNameEl.textContent = display;
   trainerNameEl.textContent = trainer ? ` - ${TRAINERS[trainer]?.name || ''}` : '';
-  if (username || trainer) userInfo.classList.remove('hidden');
+  if (display || trainer) userInfo.classList.remove('hidden');
 }
 
 function levelThreshold(level) {
@@ -1074,21 +1099,140 @@ function ensureStarterCaptured() {
   }
 }
 
-function addXP(id, amount, source) {
+// Increment a Pokémon's XP in Firestore and recompute its level
+async function gainXp(id, amount) {
   if (!id) return;
-  pokemonXP[id] = (pokemonXP[id] || 0) + amount;
-  localStorage.setItem('pokemonXP', JSON.stringify(pokemonXP));
-  const src = pokemonSources[id] || { pomodoros: 0, journals: 0, goal: 0 };
-  if (source === 'pomodoro') src.pomodoros++;
-  if (source === 'journal') src.journals++;
-  if (source === 'goal') src.goal++;
-  pokemonSources[id] = src;
-  localStorage.setItem('pokemonSources', JSON.stringify(pokemonSources));
-  logXP(amount, source);
+  if (currentUser) {
+    const ref = doc(db, 'users', currentUser.uid, 'pokedex', String(id));
+    await runTransaction(db, async tx => {
+      const snap = await tx.get(ref);
+      const data = snap.exists() ? snap.data() : { xp: 0, level: 1, capturedAt: Date.now(), sessionsContributed: 0 };
+      const newXp = (data.xp || 0) + amount;
+      const newLevel = Math.min(10, Math.floor(newXp / 50) + 1);
+      tx.set(ref, { xp: newXp, level: newLevel, capturedAt: data.capturedAt, sessionsContributed: (data.sessionsContributed || 0) + 1 }, { merge: true });
+    });
+  } else {
+    pokemonXP[id] = (pokemonXP[id] || 0) + amount;
+    localStorage.setItem('pokemonXP', JSON.stringify(pokemonXP));
+  }
   updatePartnerDisplay();
   renderPokedex();
   checkCapture();
   checkBadges();
+}
+
+// Persist the chosen partner Pokémon
+async function setPartner(id) {
+  partnerPokemonId = id;
+  if (currentUser) {
+    await setDoc(doc(db, 'users', currentUser.uid, 'settings', 'app'), { partnerPokemonId: id }, { merge: true });
+  } else {
+    localStorage.setItem('partnerPokemonId', partnerPokemonId);
+  }
+  ensureStarterCaptured();
+  updatePartnerDisplay();
+}
+
+// Retrieve or create the user's encryption salt
+async function getUserSalt() {
+  const settingsRef = doc(db, 'users', currentUser.uid, 'settings', 'app');
+  const snap = await getDoc(settingsRef);
+  let data = snap.data() || {};
+  if (!data.salt) {
+    const saltBytes = crypto.getRandomValues(new Uint8Array(16));
+    data.salt = btoa(String.fromCharCode(...saltBytes));
+    await setDoc(settingsRef, { salt: data.salt }, { merge: true });
+  }
+  return Uint8Array.from(atob(data.salt), c => c.charCodeAt(0));
+}
+
+// Derive and cache a session encryption key from a passphrase
+async function getSessionKey() {
+  if (sessionKey) return sessionKey;
+  const passphrase = prompt('Enter journal passphrase');
+  if (!passphrase) throw new Error('Passphrase required');
+  const salt = await getUserSalt();
+  const keyMaterial = await crypto.subtle.importKey('raw', new TextEncoder().encode(passphrase), 'PBKDF2', false, ['deriveKey']);
+  sessionKey = await crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt']
+  );
+  return sessionKey;
+}
+
+// Encrypt and persist a journal entry
+async function saveJournalEntry(date, plaintext, mood, tags, mediaRefs = []) {
+  if (currentUser) {
+    const key = await getSessionKey();
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const cipherBuf = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(plaintext));
+    const cipher = btoa(String.fromCharCode(...new Uint8Array(cipherBuf)));
+    await setDoc(
+      doc(db, 'users', currentUser.uid, 'journal', date),
+      { cipher, iv: btoa(String.fromCharCode(...iv)), saltVersion: 1, mood, tags, mediaRefs },
+      { merge: true }
+    );
+    await addDoc(collection(db, 'users', currentUser.uid, 'xpLog'), {
+      delta: 5,
+      reason: 'journal',
+      timestamp: serverTimestamp()
+    });
+    await gainXp(partnerPokemonId, 5);
+  } else {
+    const entryObj = { text: plaintext, mood, tags, media: mediaRefs[0] };
+    localStorage.setItem('journal-' + date, JSON.stringify(entryObj));
+    gainXp(partnerPokemonId, 5);
+  }
+  afterSave(date);
+  awardBadge('firstJournal');
+}
+
+// Decrypt a journal entry document when viewing
+async function decryptJournalEntry(docSnap) {
+  const data = docSnap.data();
+  const key = await getSessionKey();
+  const iv = Uint8Array.from(atob(data.iv), c => c.charCodeAt(0));
+  const cipher = Uint8Array.from(atob(data.cipher), c => c.charCodeAt(0));
+  const plainBuf = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, cipher);
+  return new TextDecoder().decode(plainBuf);
+}
+
+// Calculate consecutive days with recorded focus
+async function getStreak() {
+  const stats = await getFocusStats(30);
+  const dates = Object.keys(stats).sort().reverse();
+  let count = 0;
+  for (const d of dates) {
+    if (stats[d] > 0) count++;
+    else break;
+  }
+  return count;
+}
+
+// Move local guest data into Firestore once the user logs in
+async function migrateGuestDataToCloud() {
+  if (!currentUser) return;
+  if (localStorage.getItem('guestSynced')) return;
+  const stats = JSON.parse(localStorage.getItem('focusStats') || '{}');
+  for (const [date, mins] of Object.entries(stats)) {
+    const ref = doc(db, 'users', currentUser.uid, 'stats', date);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) await setDoc(ref, { minutes: mins, sessions: 0, xpGained: 0 });
+  }
+  const keys = Object.keys(localStorage).filter(k => k.startsWith('journal-'));
+  for (const key of keys) {
+    const date = key.replace('journal-', '');
+    const data = JSON.parse(localStorage.getItem(key));
+    if (data?.text) await saveJournalEntry(date, data.text, data.mood, data.tags || [], data.media ? [data.media] : []);
+  }
+  const pokes = JSON.parse(localStorage.getItem('pokemonXP') || '{}');
+  for (const [id, xp] of Object.entries(pokes)) {
+    await setDoc(doc(db, 'users', currentUser.uid, 'pokedex', id), { xp, level: getLevel(xp), capturedAt: Date.now() }, { merge: true });
+  }
+  localStorage.setItem('guestSynced', '1');
 }
 
 function checkCapture() {
@@ -1149,14 +1293,18 @@ function openPokemonModal(id) {
   pokemonModal.classList.remove('hidden');
 }
 
-function updatePartnerDisplay() {
+async function updatePartnerDisplay() {
   if (!partnerPokemonId) {
     partnerDisplay.classList.add('hidden');
     return;
   }
   const data = pokemonData.find(p => p.id === parseInt(partnerPokemonId, 10));
   if (!data) return;
-  const xp = pokemonXP[partnerPokemonId] || 0;
+  let xp = pokemonXP[partnerPokemonId] || 0;
+  if (currentUser) {
+    const snap = await getDoc(doc(db, 'users', currentUser.uid, 'pokedex', String(partnerPokemonId)));
+    if (snap.exists()) xp = snap.data().xp || 0;
+  }
   const level = getLevel(xp);
   partnerSprite.src = data.sprite;
   partnerNameEl.textContent = data.name;
@@ -1178,7 +1326,7 @@ function showToast(message) {
 }
 
 function initModals() {
-  if (!username) {
+  if (!currentUser && !username) {
     loginModal?.classList.remove('hidden');
   } else if (!trainer) {
     trainerModal?.classList.remove('hidden');
@@ -1187,73 +1335,61 @@ function initModals() {
   }
 }
 
-registerBtn?.addEventListener('click', async () => {
-  const name = usernameInput.value.trim();
-  const pass = passwordInput.value;
-  if (!name || !pass) return;
+googleLoginBtn?.addEventListener('click', async () => {
   try {
-    const res = await fetch(API_BASE + '/api/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: name, password: pass })
-    });
-    if (res.ok) {
-      await rememberAccount(name, pass);
-      showToast('Registered! Please log in.');
-    } else {
-      showToast('Registration failed');
-    }
+    await signInWithPopup(auth, new GoogleAuthProvider());
   } catch {
-    if (accounts[name]) {
-      showToast('User exists locally');
-    } else {
-      await rememberAccount(name, pass);
-      showToast('Registered locally');
-    }
+    showToast('Google login failed');
   }
 });
 
-loginBtn?.addEventListener('click', async () => {
-  const name = usernameInput.value.trim();
+emailRegisterBtn?.addEventListener('click', async () => {
+  const email = emailInput.value.trim();
   const pass = passwordInput.value;
-  if (!name || !pass) return;
-  const hash = await hashPassword(pass);
-
-  // Try local accounts first so offline logins succeed without a network call
-  if (accounts[name] === hash) {
-    authToken = 'local';
-    localStorage.setItem('token', authToken);
-    username = name;
-    localStorage.setItem('username', name);
-    loginModal.classList.add('hidden');
-    updateUserInfo();
-    initModals();
-    showToast('Logged in offline');
-    return;
-  }
-
+  if (!email || !pass) return;
   try {
-    const res = await fetch(API_BASE + '/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: name, password: pass })
-    });
-    const data = await res.json().catch(() => ({}));
-    if (res.ok && data.token) {
-      authToken = data.token;
-      localStorage.setItem('token', authToken);
-      username = name;
-      localStorage.setItem('username', name);
-      await rememberAccount(name, pass);
-      loginModal.classList.add('hidden');
-      updateUserInfo();
-      initModals();
-    } else {
-      showToast('Login failed');
-    }
+    await createUserWithEmailAndPassword(auth, email, pass);
   } catch {
-    showToast('Server unreachable');
+    showToast('Registration failed');
   }
+});
+
+emailLoginBtn?.addEventListener('click', async () => {
+  const email = emailInput.value.trim();
+  const pass = passwordInput.value;
+  if (!email || !pass) return;
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch {
+    showToast('Login failed');
+  }
+});
+
+// React to auth state changes and load Firestore-backed data
+onAuthStateChanged(auth, async user => {
+  currentUser = user;
+  if (user) {
+    username = user.displayName || user.email || '';
+    loginModal?.classList.add('hidden');
+    await migrateGuestDataToCloud();
+    const settingsRef = doc(db, 'users', user.uid, 'settings', 'app');
+    const snap = await getDoc(settingsRef);
+    const data = snap.data() || {};
+    partnerPokemonId = data.partnerPokemonId || partnerPokemonId;
+    if (data.displayName) username = data.displayName;
+    if (data.theme) applyTheme(data.theme);
+    updateUserInfo();
+    updatePartnerDisplay();
+    const stats = await getFocusStats(7);
+    renderFocusChart(stats);
+    renderStatsSummary(stats);
+    streak = await getStreak();
+    renderStats();
+  } else {
+    currentUser = null;
+    loginModal?.classList.remove('hidden');
+  }
+  initModals();
 });
 
 trainerModal?.addEventListener('click', e => {
@@ -1270,11 +1406,8 @@ starterModal?.addEventListener('click', e => {
   const img = e.target.closest('img[data-id]');
   if (!img) return;
   const id = parseInt(img.dataset.id, 10);
-  partnerPokemonId = String(id);
-  localStorage.setItem('partnerPokemonId', partnerPokemonId);
-  ensureStarterCaptured();
+  setPartner(String(id));
   starterModal.classList.add('hidden');
-  updatePartnerDisplay();
 });
 
 openPokedexBtn?.addEventListener('click', () => {
@@ -1346,10 +1479,7 @@ pokemonModal?.addEventListener('click', e => {
 
 setPartnerBtn?.addEventListener('click', () => {
   const id = setPartnerBtn.dataset.id;
-  partnerPokemonId = id;
-  localStorage.setItem('partnerPokemonId', partnerPokemonId);
-  ensureStarterCaptured();
-  updatePartnerDisplay();
+  setPartner(id);
   pokemonModal.classList.add('hidden');
 });
 
