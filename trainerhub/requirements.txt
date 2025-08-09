@@ -1,0 +1,9 @@
+Django>=5.0
+djangorestframework
+djangorestframework-simplejwt
+django-allauth
+django-cors-headers
+drf-spectacular
+dj-database-url
+psycopg2-binary
+whitenoise

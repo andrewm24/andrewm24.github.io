@@ -1,0 +1,7 @@
+[
+  {"id": 1, "name": "Bulbasaur", "type": "grass", "sprite_url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png", "description": "A strange seed was planted on its back at birth."},
+  {"id": 4, "name": "Charmander", "type": "fire", "sprite_url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png", "description": "Obviously prefers hot places."},
+  {"id": 7, "name": "Squirtle", "type": "water", "sprite_url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png", "description": "After birth, its back swells and hardens into a shell."},
+  {"id": 25, "name": "Pikachu", "type": "electric", "sprite_url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png", "description": "When several of these POKéMON gather, their electricity could build and cause lightning storms."},
+  {"id": 39, "name": "Jigglypuff", "type": "fairy", "sprite_url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/39.png", "description": "Uses its alluring eyes to enrapture its foe."}
+]

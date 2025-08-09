@@ -1,3 +1,6 @@
 node_modules/
 server/uploads/
 server/database.sqlite3
+__pycache__/
+*.pyc
+trainerhub/db.sqlite3
