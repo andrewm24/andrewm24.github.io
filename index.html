@@ -1,191 +1,291 @@
- qiehxd-codex/fix-formatting-error-on-website
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta
-    name="description"
-    content="PokéJournal blends a Pomodoro timer with a private daily journal for focused productivity."
-  />
-  <title>PokéJournal</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Press+Start+2P&display=swap"
-    rel="stylesheet"
-  />
-  <link rel="stylesheet" href="style.css?v=4" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Portfolio website for Andrew Makarevich, a Computer Engineering student exploring satellite communications, embedded systems, and XR development."
+    />
+    <title>Andrew Makarevich &mdash; Computer Engineering Student</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header" id="top">
+      <div class="container">
+        <a class="brand" href="#top" aria-label="Andrew Makarevich home">Andrew Makarevich</a>
+        <button class="nav-toggle" aria-expanded="false" aria-controls="primary-navigation">
+          <span class="sr-only">Toggle navigation</span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <nav id="primary-navigation" class="nav" data-nav data-open="false">
+          <a href="#about">About</a>
+          <a href="#experience">Experience</a>
+          <a href="#education">Education</a>
+          <a href="#projects">Projects</a>
+          <a href="#skills">Skills</a>
+          <a href="#contact">Contact</a>
+        </nav>
+      </div>
+    </header>
 
-</head>
-<body>
-  <div class="pokedex">
-    <div class="screen">
-      <header>
-        <div class="pokeball-wrapper">
-          <div class="pokeball" aria-hidden="true"></div>
+    <main>
+      <section id="about" class="hero">
+        <div class="container hero__content">
+          <div>
+            <p class="hero__eyebrow">Computer Engineering Student</p>
+            <h1>Hi, I'm Andrew Makarevich.</h1>
+            <p class="hero__summary">
+              UMD Computer Engineering student in College Park, MD exploring satellite communications,
+              embedded systems, and XR development.
+            </p>
+            <div class="hero__actions">
+              <a class="btn" href="mailto:amakarev@terpmail.umd.edu">Email Me</a>
+              <a class="btn btn--outline" href="https://linkedin.com/in/andrew-makarevich" target="_blank" rel="noreferrer"
+                >LinkedIn</a
+              >
+            </div>
+          </div>
+          <aside class="hero__details">
+            <div class="detail-card">
+              <h2>At a glance</h2>
+              <ul>
+                <li><span>Location</span><strong>College Park, MD</strong></li>
+                <li><span>Interests</span><strong>Satellite comms, embedded firmware, XR</strong></li>
+                <li><span>Languages</span><strong>English · Russian · Spanish · French · Mandarin</strong></li>
+              </ul>
+            </div>
+          </aside>
         </div>
-        <h1>PokéJournal</h1>
-        <p class="tagline">Catch your thoughts &amp; train your focus</p>
-        <p id="user-info" class="user-info hidden">
-          <span id="user-name"></span>
-          <span id="trainer-name"></span>
-        </p>
-      </header>
-      <img
-        id="background-pokemon"
-        src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png"
-        class="runner"
-        alt=""
-        aria-hidden="true"
-      />
+      </section>
 
-      <main>
-    <section id="timer">
-      <h2>Pomodoro Timer</h2>
-      <div id="time-wrapper">
-        <svg id="progress" viewBox="0 0 100 100">
-          <circle class="bg" cx="50" cy="50" r="45"></circle>
-          <circle class="bar" cx="50" cy="50" r="45"></circle>
-        </svg>
-      </div>
-      <div id="time">25:00</div>
-      <div class="duration-settings">
-        <label>Work (min)
-          <select id="work-duration"></select>
-        </label>
-        <label>Break (min)
-          <select id="break-duration"></select>
-        </label>
-      </div>
-      <div class="controls">
-        <button id="start">Start</button>
-        <button id="pause">Pause</button>
-        <button id="reset">Reset</button>
-      </div>
-      <div class="stats">
-        <p>Total Focus: <span id="total-focus">0</span> min</p>
-        <p>Sessions: <span id="session-count">0</span></p>
-        <p>XP: <span id="xp">0</span></p>
-      </div>
-    </section>
+      <section id="experience" class="section">
+        <div class="container">
+          <header class="section__header">
+            <h2>Experience</h2>
+            <p>Hands-on engineering work across spacecraft avionics, human-computer interaction, and robotics.</p>
+          </header>
+          <div class="timeline">
+            <article class="timeline__item">
+              <div class="timeline__meta">
+                <p class="timeline__period">Jan 2025 &ndash; Present</p>
+                <p class="timeline__location">College Park, MD</p>
+              </div>
+              <div class="timeline__content">
+                <h3>Avionics Engineer &mdash; UMD Satellite Development Program</h3>
+                <ul>
+                  <li>Designing and testing communications subsystem hardware for a 6U CubeSat mission.</li>
+                  <li>Developing link budgets and integration procedures that keep the team ready for launch.</li>
+                  <li>Sharing trade studies and design updates with multidisciplinary review boards.</li>
+                </ul>
+              </div>
+            </article>
 
-      <div class="journal-actions">
-        <input
-          type="text"
-          id="search-journal"
-          placeholder="Search entries..."
-          aria-label="Search journal entries"
-        />
-        <button id="export-journal">Export Journal</button>
-      </div>
- main
+            <article class="timeline__item">
+              <div class="timeline__meta">
+                <p class="timeline__period">Apr 2024 &ndash; Jun 2024</p>
+                <p class="timeline__location">Baltimore, MD</p>
+              </div>
+              <div class="timeline__content">
+                <h3>Engineering Intern &mdash; Harbor Designs &amp; Manufacturing LLC</h3>
+                <ul>
+                  <li>Created user flows, wireframes, and app prototypes in Adobe XD for new product concepts.</li>
+                  <li>Coordinated with hardware and software engineers to align interface design with device capabilities.</li>
+                </ul>
+              </div>
+            </article>
 
-      <div id="entries"></div>
-    </section>
+            <article class="timeline__item">
+              <div class="timeline__meta">
+                <p class="timeline__period">Jun 2023 &ndash; Aug 2023</p>
+                <p class="timeline__location">Baltimore, MD</p>
+              </div>
+              <div class="timeline__content">
+                <h3>Visiting HS Researcher / Data Annotator &mdash; Johns Hopkins University</h3>
+                <ul>
+                  <li>Segmented cranial surgery videos to support augmented reality deep learning research.</li>
+                  <li>Integrated annotated datasets into the lab's 3D visualization platform to accelerate experimentation.</li>
+                </ul>
+              </div>
+            </article>
 
- qiehxd-codex/fix-formatting-error-on-website
-    <section id="journal">
-      <h2>Daily Journal</h2>
-      <div class="journal-input">
-        <input type="date" id="entry-date" />
-        <textarea id="entry-text" placeholder="Write your reflection..."></textarea>
-        <input type="file" id="entry-media" accept="image/*,video/*" />
-        <div id="media-preview" class="media-preview" aria-hidden="true"></div>
-        <p id="error" class="error" aria-live="polite"></p>
-        <button id="save-entry">Save Entry</button>
-      </div>
-      <div class="journal-actions">
-        <input
-          type="text"
-          id="search-journal"
-          placeholder="Search entries..."
-          aria-label="Search journal entries"
-        />
-        <button id="export-journal">Export Journal</button>
-      </div>
-      <div id="entries"></div>
-    </section>
-      </main>
-    </div>
-  </div>
-  <div id="login-modal" class="modal hidden">
-    <div class="modal-content">
-      <h2>Login</h2>
-      <input type="text" id="username" placeholder="Your name" />
-      <button id="login-btn">Login</button>
-    </div>
-  </div>
+            <article class="timeline__item">
+              <div class="timeline__meta">
+                <p class="timeline__period">Jan 2023 &ndash; Jun 2024</p>
+                <p class="timeline__location">Baltimore, MD</p>
+              </div>
+              <div class="timeline__content">
+                <h3>Computer Programmer &amp; CAD Lead &mdash; FRC Team 1719 Robotics</h3>
+                <ul>
+                  <li>Programmed Java control systems for competition robots, improving autonomous positioning accuracy.</li>
+                  <li>Modeled and validated mechanical assemblies that balanced speed, stability, and manufacturability.</li>
+                  <li>Led design reviews, coordinating software and mechanical contributors toward integrated solutions.</li>
+                </ul>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
 
-  <div id="trainer-modal" class="modal hidden">
-    <div class="modal-content">
-      <h2>Choose your trainer!</h2>
-      <div class="trainers">
-        <button data-id="red">Red</button>
-        <button data-id="leaf">Leaf</button>
-        <button data-id="ethan">Ethan</button>
-      </div>
-    </div>
-  </div>
+      <section id="education" class="section section--alt">
+        <div class="container">
+          <header class="section__header">
+            <h2>Education</h2>
+          </header>
+          <div class="card-grid">
+            <article class="card">
+              <h3>University of Maryland, College Park</h3>
+              <p class="card__subtitle">B.S. Computer Engineering &middot; Expected Dec 2028</p>
+              <p class="card__meta">GPA: 3.75 / 4.00</p>
+              <p>
+                Coursework focuses on digital system design, embedded firmware, communications theory, and human-computer
+                interaction.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
 
-  <div id="starter-modal" class="modal hidden">
-    <div class="modal-content">
-      <h2>Choose your starter!</h2>
-      <div class="starters">
-        <img
-          data-id="1"
-          src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png"
-          alt="Bulbasaur"
-        />
-        <img
-          data-id="4"
-          src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png"
-          alt="Charmander"
-        />
-        <img
-          data-id="7"
-          src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png"
-          alt="Squirtle"
-        />
-      </div>
-    </div>
-  </div>
-  <script src="script.js?v=4"></script>
+      <section id="projects" class="section">
+        <div class="container">
+          <header class="section__header">
+            <h2>Projects</h2>
+            <p>Exploring embedded signal processing and real-time control with microcontrollers.</p>
+          </header>
+          <div class="card-grid">
+            <article class="card">
+              <h3>Clap-Activated LED Strip Controller</h3>
+              <p class="card__subtitle">Embedded C &middot; STM32 &middot; Signal Processing</p>
+              <p>
+                Developing real-time firmware for an STM32 microcontroller that detects clap patterns and toggles multi-zone LED
+                strips with minimal latency.
+              </p>
+              <p class="card__meta">Sep 2025 &ndash; Present</p>
+            </article>
+          </div>
+        </div>
+      </section>
 
-</body>
+      <section id="skills" class="section section--alt">
+        <div class="container">
+          <header class="section__header">
+            <h2>Skills</h2>
+          </header>
+          <div class="skills-grid">
+            <article class="skills-card">
+              <h3>Programming</h3>
+              <ul>
+                <li>Python</li>
+                <li>C / C++</li>
+                <li>Java</li>
+                <li>JavaScript</li>
+                <li>Embedded Systems</li>
+              </ul>
+            </article>
+            <article class="skills-card">
+              <h3>Hardware &amp; Electronics</h3>
+              <ul>
+                <li>PCB Design</li>
+                <li>Circuit Prototyping</li>
+                <li>Arduino / ESP32</li>
+                <li>Robotics Systems</li>
+              </ul>
+            </article>
+            <article class="skills-card">
+              <h3>Developer Tools</h3>
+              <ul>
+                <li>Git</li>
+                <li>VS Code</li>
+                <li>Visual Studio</li>
+                <li>Eclipse</li>
+              </ul>
+            </article>
+            <article class="skills-card">
+              <h3>Libraries</h3>
+              <ul>
+                <li>Pandas</li>
+                <li>NumPy</li>
+                <li>Matplotlib</li>
+              </ul>
+            </article>
+            <article class="skills-card">
+              <h3>CAD &amp; Modeling</h3>
+              <ul>
+                <li>Onshape</li>
+                <li>SolidWorks</li>
+                <li>Fusion 360</li>
+                <li>Luma3D</li>
+              </ul>
+            </article>
+            <article class="skills-card">
+              <h3>UI/UX &amp; Creative Tools</h3>
+              <ul>
+                <li>Adobe XD</li>
+                <li>Unreal Engine (XR / 3D)</li>
+              </ul>
+            </article>
+            <article class="skills-card">
+              <h3>Languages</h3>
+              <ul>
+                <li>English (Native)</li>
+                <li>Russian (Native)</li>
+                <li>Spanish (Professional)</li>
+                <li>French (Professional)</li>
+                <li>Mandarin (HSK 2)</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact" class="section">
+        <div class="container contact">
+          <div>
+            <header class="section__header">
+              <h2>Let's build something together</h2>
+              <p>Reach out for collaborations, internships, or to chat about aerospace and immersive technology.</p>
+            </header>
+            <div class="contact__details">
+              <a href="mailto:amakarev@terpmail.umd.edu" class="contact__item">
+                <span>Email</span>
+                <strong>amakarev@terpmail.umd.edu</strong>
+              </a>
+              <a href="tel:14107946297" class="contact__item">
+                <span>Phone</span>
+                <strong>410-794-6297</strong>
+              </a>
+              <a href="https://linkedin.com/in/andrew-makarevich" target="_blank" rel="noreferrer" class="contact__item">
+                <span>LinkedIn</span>
+                <strong>/andrew-makarevich</strong>
+              </a>
+            </div>
+          </div>
+          <div class="contact__card">
+            <h3>Currently exploring</h3>
+            <ul>
+              <li>Low-power communication architectures for CubeSats</li>
+              <li>Audio-based gesture recognition on microcontrollers</li>
+              <li>Immersive XR interfaces for technical training</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>&copy; <span id="year"></span> Andrew Makarevich. Built with care and curiosity.</p>
+      </div>
+    </footer>
+
+    <script src="script.js" type="module"></script>
+  </body>
 </html>
-
-  </main>
-</div>
-</div>
-
-<div id="login-modal" class="modal hidden">
-  <div class="modal-content">
-    <h2>Login</h2>
-    <input type="text" id="username" placeholder="Your name" />
-    <button id="login-btn">Login</button>
-  </div>
-</div>
-
-<div id="trainer-modal" class="modal hidden">
-  <div class="modal-content">
-    <h2>Choose your trainer!</h2>
-    <div class="trainers">
-      <button data-id="red">Red</button>
-      <button data-id="leaf">Leaf</button>
-      <button data-id="ethan">Ethan</button>
-    </div>
-  </div>
-</div>
-
-<div id="starter-modal" class="modal hidden">
-  <div class="modal-content">
-    <h2>Choose your starter!</h2>
-    <div class="starters">
-      <img data-id="1" src="..." alt="Bulbasaur" />
-      <img data-id="4" src="..." alt="Charmander" />
-      <img data-id="7" src="..." alt="Squirtle" />
-    </div>
-  </div>
-</div>
- main
