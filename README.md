@@ -1,24 +1,38 @@
-# PokéJournal
+# Personal Website
 
-A minimalist, Pokémon-themed web app that combines a Pomodoro-style timer with a private daily journal. All data stays in your browser.
+My personal site: [andrewm24.github.io/Personal-Website](https://andrewm24.github.io/Personal-Website/)
 
-## Features
+Static HTML, one stylesheet, one small script. No framework. Vite handles the build.
 
-- Adjustable focus timer with work/break lengths saved between sessions
-- Journal entries saved by date in `localStorage`
-- Expand, edit, or delete entries later
-- Attach images or videos to journal entries and preview them before saving
-- Track total focused minutes and session count
-- Confetti celebration and random Pokémon capture when the timer completes
-- Optional browser notification announcing each Pokémon you catch
-- Calming, responsive layout with playful Pokémon styling and subtle animations
-- Offline-ready via simple service worker caching
-- Log in and pick a trainer before choosing your starter Pokémon
-- Earn XP for each focus session and capture a new Pokémon after reaching the XP threshold
-- Search journal entries and export them as JSON
+## Structure
 
-## Usage
+```
+index.html          Page content
+src/main.js         Theme toggle, scroll reveal, nav highlighting
+src/style.css       Design tokens and layout
+public/assets/      Résumé PDF and other static files
+```
 
-Open `index.html` in a modern browser. The date field defaults to today; write a reflection and press **Save Entry**. Click past entries to expand or edit them.
+## Running it
 
-Entries and timer data are stored locally in `localStorage`. Clearing browser data removes them. The site can be hosted as static files, e.g. with GitHub Pages.
+```bash
+npm install
+```
+
+```bash
+npm run dev
+```
+
+Build to `dist/`:
+
+```bash
+npm run build
+```
+
+## Deploying
+
+`.github/workflows/deploy-pages.yml` builds and publishes to GitHub Pages on every push to
+`main`.
+
+Because Pages serves the site from a subpath, `vite.config.js` sets `base: './'` and links to
+assets are relative — keep them that way.
