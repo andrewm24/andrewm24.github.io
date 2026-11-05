@@ -6,7 +6,7 @@
     <title>Andrew Makarevich</title>
     <meta
       name="description"
-      content="Andrew Makarevich — computer engineering student at the University of Maryland. I build embedded systems: firmware, circuit boards, and the radio links between them."
+      content="Andrew Makarevich — computer engineering student at the University of Maryland. I build embedded hardware: flight computers, power electronics, and the radio links that talk to satellites."
     />
     <meta name="theme-color" content="#faf8f5" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -50,20 +50,15 @@
 
     <main id="main">
       <section class="hero" id="top">
-        <svg class="orbit" viewBox="0 0 400 240" aria-hidden="true" focusable="false">
-          <path
-            class="orbit__path"
-            d="M 10,120 A 190,100 0 1,1 390,120 A 190,100 0 1,1 10,120"
-            fill="none"
-          />
-          <circle class="orbit__dot" r="3.5" />
-        </svg>
+        <div class="hero__head">
+          <p class="kicker">Computer Engineering · University of Maryland</p>
+          <h1>Andrew&nbsp;Makarevich</h1>
+        </div>
 
         <div class="hero__content">
-          <p class="kicker">College Park, Maryland</p>
-          <h1>Andrew&nbsp;Makarevich</h1>
           <p class="lede">
-            I'm a computer engineering student at the University of Maryland. I enjoy working with electronics, especially on satelites. In my free time, I learn new languages(currently on Mandarin), play lots of soccer, and eat tons of delicious food.  
+            I build embedded hardware: flight computers, power electronics, and the radio links
+            that talk to satellites.
           </p>
           <ul class="hero__links">
             <li><a href="mailto:amakarev@terpmail.umd.edu">amakarev@terpmail.umd.edu</a></li>
@@ -80,18 +75,42 @@
             </li>
           </ul>
         </div>
+
+        <div class="portrait">
+          <svg class="orbit" viewBox="0 0 400 400" aria-hidden="true" focusable="false">
+            <ellipse class="orbit__path" cx="200" cy="200" rx="190" ry="120" fill="none" />
+            <circle class="orbit__dot" r="4" />
+          </svg>
+          <img
+            class="portrait__photo"
+            src="assets/andrew-headshot.jpg"
+            alt="Andrew Makarevich, smiling, in a white collared shirt in front of a wall printed with code"
+            width="720"
+            height="720"
+            decoding="async"
+          />
+        </div>
       </section>
 
       <section class="section" id="about" data-reveal>
         <h2 class="section__title">About</h2>
         <div class="prose">
           <p>
-            Most of what I do sits close to the hardware. I'm working to gain strong engineering fundimentals as I build projects in my free time! Currently, I'm building a drone from scratch, learning circuit and PCB design in the process!
+            Most of what I do sits close to the hardware. On THEIA, the UMD Satellite Development
+            Program's CubeSat, I lead the six-person Electrical Power System team and built the
+            ground station. On TERP RAPTOR, a UMD CubeSat headed for a 2029 flyby of the asteroid
+            Apophis, I'm designing the flight software interface to the attitude control system.
           </p>
           <p>
-            Right now I lead the ground station for UMD's Satellite Development Program and work on a
-            haptic feedback glove in the EXACT Robotics Lab. This summer, I worked at Booz Allen
-            Hamilton as a systems engineering intern.
+            This past summer I was a systems engineering intern at Booz Allen Hamilton, where I
+            built and validated a wire harness between two hardware systems and helped build a
+            firmware deployment tool for industrial control systems. On my own time I'm building a
+            quadcopter from the board up: flight computer, ESC, and bare-metal firmware.
+          </p>
+          <p>
+            I'm finishing a B.S. in Computer Engineering with a minor in Chinese (expected December
+            2028). Outside of engineering I'm usually learning a language, playing soccer, or
+            finding something good to eat.
           </p>
         </div>
       </section>
@@ -101,51 +120,84 @@
         <ol class="timeline">
           <li class="entry" data-reveal>
             <div class="entry__meta">
-              <span class="entry__date">Summer 2026</span>
-              <span class="entry__place">Incoming</span>
+              <span class="entry__date">Jun — Aug 2026</span>
+              <span class="entry__place">Annapolis Junction, MD</span>
             </div>
             <div class="entry__body">
               <h3>Systems Engineering Intern</h3>
               <p class="entry__org">Booz Allen Hamilton</p>
-              <p>
-                Starting this summer on automated firmware patching and monitoring for industrial
-                control systems: a backend that can fingerprint and talk to embedded devices over
-                TCP, plus a network agent that follows the Purdue model that pushes firmware updates across
-                firewall boundaries.
-              </p>
+              <ul class="entry__points">
+                <li>
+                  Designed, fabricated, and validated a multi-signal wire harness between two
+                  independent hardware systems, checking continuity, signal integrity, and power
+                  delivery under load.
+                </li>
+                <li>
+                  Co-developed an automated firmware deployment tool for industrial control system
+                  (ICS) devices on a Purdue-model segmented network, with custom subnetting and
+                  firewall rules.
+                </li>
+                <li>
+                  Built C/libcurl middleware that sends HTTP packets to embedded targets, backed by a
+                  Dockerized SQLite store and a React/D3.js telemetry dashboard.
+                </li>
+              </ul>
             </div>
           </li>
 
           <li class="entry" data-reveal>
             <div class="entry__meta">
-              <span class="entry__date">2025 — Present</span>
+              <span class="entry__date">Oct 2026 — Present</span>
               <span class="entry__place">College Park, MD</span>
             </div>
             <div class="entry__body">
-              <h3>Ground Station Lead</h3>
-              <p class="entry__org">UMD Satellite Development Program</p>
-              <p>
-                I lead the ground station and support the CubeSat
-                communications architecture behind it: link budgets, modulation and forward error
-                correction trade studies, and planning how the comms hardware gets integrated for
-                flight.
-              </p>
+              <h3>ADCS &amp; Flight Software Engineer</h3>
+              <p class="entry__org">TERP RAPTOR · UMD CubeSat mission to asteroid Apophis</p>
+              <ul class="entry__points">
+                <li>
+                  Designing the flight software interface to a commercial ADCS for a 2029 Apophis
+                  flyby: the serial command and telemetry link and the FSW modules that use it.
+                </li>
+                <li>
+                  Turning the ADCS interface documentation into command, telemetry, mode, and
+                  fault-handling requirements for the Preliminary Design Review.
+                </li>
+                <li>
+                  Specifying checkout support for the reaction wheels and attitude sensors, with
+                  limit monitoring on wheel speed, temperature, and bus voltage, and estimating ADCS
+                  telemetry volume for the mission data budget.
+                </li>
+              </ul>
             </div>
           </li>
 
           <li class="entry" data-reveal>
             <div class="entry__meta">
-              <span class="entry__date">2025 — Present</span>
+              <span class="entry__date">Jan 2025 — Present</span>
               <span class="entry__place">College Park, MD</span>
             </div>
             <div class="entry__body">
-              <h3>Member</h3>
-              <p class="entry__org">EXACT Robotics Lab</p>
-              <p>
-                Prototyping a wearable haptic feedback glove built around a distributed array of flex
-                sensors and micro-actuators. I work on the ROS 2 side in C++ and Python — data
-                serialization and the closed-loop real-time PWM control.
-              </p>
+              <h3>Avionics Engineer, Ground Station &amp; EPS Lead</h3>
+              <p class="entry__org">THEIA · UMD Satellite Development Program CubeSat</p>
+              <ul class="entry__points">
+                <li>
+                  Lead a six-person Electrical Power System team and own the subsystem architecture,
+                  power budgets, and assembly, integration, and test (AIT) plans.
+                </li>
+                <li>
+                  Run AIT procedures for the spacecraft avionics, including the on-board computer
+                  (OBC) and S-band transmitter, in an ESD-safe cleanroom.
+                </li>
+                <li>
+                  Found an OBC-to-S-band pinout fault that left the transmitter's TX-enable line
+                  unreachable, and built a remapping harness that restored the link.
+                  <a href="#pinout-fault">Read the writeup.</a>
+                </li>
+                <li>
+                  Built a 915 MHz UHF ground station transceiver around two RFM9x LoRa modules, plus
+                  the operator telemetry UI and an automated OBC checkout suite.
+                </li>
+              </ul>
             </div>
           </li>
 
@@ -172,9 +224,7 @@
             <div class="entry__body">
               <h3>Visiting Researcher</h3>
               <p class="entry__org">Johns Hopkins University</p>
-              <p>
-                Annotated cranial surgery datasets for deep learning models. Empowered the future of autonomous surgery!
-              </p>
+              <p>Annotated cranial surgery datasets used to train deep learning models.</p>
             </div>
           </li>
         </ol>
@@ -183,33 +233,250 @@
       <section class="section" id="projects">
         <h2 class="section__title" data-reveal>Projects</h2>
         <div class="projects">
-          <article class="project" data-reveal>
-            <h3>Quadcopter Flight Computer</h3>
+          <article class="project" id="quadcopter" data-reveal>
+            <p class="project__status">In progress</p>
+            <h3>Quadcopter Flight Computer &amp; ESC</h3>
             <p>
-              A flight controller I built from the board up. Four-layer PCB carrying an STM32 and an
-              IMU over SPI, a half-bridge ESC circuit I fabricated myself with N-channel MOSFETs, and
-              bare-metal C firmware that runs the PID stabilization loop and PWM motor output through
-              direct register writes.
+              A quadcopter I'm building from the board up: a four-layer flight computer, a
+              three-phase brushless ESC, and bare-metal C firmware that runs the PID stabilization
+              loop and drives the motors.
             </p>
             <ul class="tags">
               <li>STM32</li>
               <li>Bare-metal C</li>
-              <li>4-layer PCB</li>
-              <li>MOSFET half-bridges</li>
+              <li>KiCad</li>
+              <li>Power electronics</li>
             </ul>
+
+            <details class="deep-dive">
+              <summary>Design notes</summary>
+              <div class="deep-dive__body">
+                <figure class="diagram">
+                  <div class="diagram__scroll">
+                    <svg viewBox="0 0 640 262" role="img" aria-labelledby="bd-title">
+                      <title id="bd-title">
+                        Block diagram: the battery feeds buck and LDO regulators that power the STM32
+                        and IMU on the flight computer, and feeds the ESC half-bridges directly. The
+                        STM32 reads the IMU over SPI and sends PWM from hardware timers to the gate
+                        drivers, which switch three N-channel MOSFET half-bridges that drive the
+                        brushless motor. There are four ESCs.
+                      </title>
+                      <defs>
+                        <marker id="bd-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                          <path class="bd-head" d="M0,0 L10,5 L0,10 z" />
+                        </marker>
+                      </defs>
+
+                      <rect class="bd-group" x="155" y="18" width="470" height="90" rx="8" />
+                      <text class="bd-group-label" x="167" y="34">Flight computer · 4-layer PCB</text>
+                      <rect class="bd-group" x="155" y="138" width="470" height="100" rx="8" />
+                      <text class="bd-group-label" x="167" y="154">ESC × 4</text>
+
+                      <rect class="bd-box" x="15" y="45" width="115" height="50" rx="6" />
+                      <text class="bd-text" x="72" y="74">Battery</text>
+
+                      <rect class="bd-box" x="170" y="45" width="130" height="50" rx="6" />
+                      <text class="bd-text" x="235" y="74">Buck / LDO rails</text>
+
+                      <rect class="bd-box bd-box--key" x="340" y="45" width="130" height="50" rx="6" />
+                      <text class="bd-text" x="405" y="74">STM32 MCU</text>
+
+                      <rect class="bd-box" x="500" y="45" width="110" height="50" rx="6" />
+                      <text class="bd-text" x="555" y="74">6-axis IMU</text>
+
+                      <rect class="bd-box" x="170" y="168" width="130" height="50" rx="6" />
+                      <text class="bd-text" x="235" y="197">Gate drivers</text>
+
+                      <rect class="bd-box bd-box--key" x="340" y="168" width="130" height="50" rx="6" />
+                      <text class="bd-text" x="405" y="189">3 × half-bridge</text>
+                      <text class="bd-text bd-text--sub" x="405" y="205">N-ch MOSFETs</text>
+
+                      <rect class="bd-box" x="500" y="168" width="110" height="50" rx="6" />
+                      <text class="bd-text" x="555" y="197">BLDC motor</text>
+
+                      <path class="bd-line" d="M130,70 H168" marker-end="url(#bd-arrow)" />
+                      <path class="bd-line" d="M300,70 H338" marker-end="url(#bd-arrow)" />
+                      <path class="bd-line" d="M500,70 H472" marker-end="url(#bd-arrow)" />
+                      <text class="bd-label" x="486" y="62">SPI</text>
+
+                      <path class="bd-line" d="M405,95 V124 H235 V166" marker-end="url(#bd-arrow)" />
+                      <text class="bd-label" x="320" y="119">PWM · hardware timers</text>
+
+                      <path class="bd-line" d="M300,193 H338" marker-end="url(#bd-arrow)" />
+                      <path class="bd-line" d="M470,193 H498" marker-end="url(#bd-arrow)" />
+
+                      <path class="bd-line bd-line--power" d="M72,95 V254 H405 V220" marker-end="url(#bd-arrow)" />
+                      <text class="bd-label bd-label--start" x="84" y="248">high-current battery rail</text>
+                    </svg>
+                  </div>
+                  <figcaption>System block diagram.</figcaption>
+                </figure>
+
+                <div class="deep-dive__grid">
+                  <section>
+                    <h4>Flight computer</h4>
+                    <p>
+                      A four-layer board carrying the STM32 and a six-axis IMU on high-speed SPI, with
+                      regulated power rails, controlled-impedance routing, and split ground planes.
+                    </p>
+                  </section>
+                  <section>
+                    <h4>ESC</h4>
+                    <p>
+                      A three-phase brushless controller: three half-bridge stages of N-channel
+                      MOSFETs behind gate drivers. The high-current polygon pours are laid out to
+                      keep the switching loops small and their parasitic inductance low.
+                    </p>
+                  </section>
+                  <section>
+                    <h4>Firmware</h4>
+                    <p>
+                      Bare-metal C with direct register access, DMA, and hardware timers for the PID
+                      stabilization loop and PWM motor output.
+                    </p>
+                  </section>
+                </div>
+
+                <!--
+                  TODO (Andrew): fill these in and uncomment. Each one is a question an
+                  interviewer will ask, so answer it the way you would out loud.
+
+                <section>
+                  <h4>Layer stackup</h4>
+                  <table class="stackup">
+                    <tr><th>L1</th><td>Signal + components</td><td>…</td></tr>
+                    <tr><th>L2</th><td>…</td><td>…</td></tr>
+                    <tr><th>L3</th><td>…</td><td>…</td></tr>
+                    <tr><th>L4</th><td>…</td><td>…</td></tr>
+                  </table>
+                  <p>Why this order, board thickness, which traces are impedance-controlled.</p>
+                </section>
+
+                <section>
+                  <h4>Choosing the MOSFETs and gate driver</h4>
+                  <p>Part numbers, Vds/Rds(on)/Qg trade-off, expected phase current, why this gate
+                  driver (bootstrap? dead time? current), what you rejected and why.</p>
+                </section>
+
+                <section>
+                  <h4>A problem I hit</h4>
+                  <p>What you saw, what you suspected first, how you measured it (scope, logic
+                  analyzer), what the actual cause was, what you changed.</p>
+                </section>
+
+                <div class="figures">
+                  <figure>
+                    <img src="assets/quad/fc-layout.png" alt="KiCad layout of the flight computer" loading="lazy" />
+                    <figcaption>Flight computer layout in KiCad.</figcaption>
+                  </figure>
+                  <figure>
+                    <img src="assets/quad/fc-3d.png" alt="3D render of the flight computer board" loading="lazy" />
+                    <figcaption>Flight computer, 3D render.</figcaption>
+                  </figure>
+                  <figure>
+                    <img src="assets/quad/esc-3d.png" alt="3D render of the ESC board" loading="lazy" />
+                    <figcaption>ESC, 3D render.</figcaption>
+                  </figure>
+                  <figure>
+                    <img src="assets/quad/scope-pwm.png" alt="Oscilloscope capture of PWM output" loading="lazy" />
+                    <figcaption>PWM output at … kHz.</figcaption>
+                  </figure>
+                  <figure>
+                    <img src="assets/quad/scope-gate.png" alt="Oscilloscope capture of a gate drive waveform" loading="lazy" />
+                    <figcaption>High-side gate drive, showing dead time.</figcaption>
+                  </figure>
+                </div>
+                -->
+              </div>
+            </details>
+          </article>
+
+          <article class="project" id="pinout-fault" data-reveal>
+            <p class="project__status">Debugging writeup · THEIA</p>
+            <h3>The OBC-to-S-band pinout fault</h3>
+            <p>
+              During integration and test on THEIA, the S-band transmitter wouldn't transmit when
+              commanded by the on-board computer. The cause was a pinout mismatch between the two
+              boards.
+            </p>
+            <ul class="tags">
+              <li>AIT</li>
+              <li>Schematic tracing</li>
+              <li>Wire harnessing</li>
+              <li>RF</li>
+            </ul>
+
+            <details class="deep-dive">
+              <summary>How I found it</summary>
+              <div class="deep-dive__body">
+                <div class="deep-dive__grid">
+                  <section>
+                    <h4>Symptom</h4>
+                    <p>
+                      No RF output when the OBC commanded the transmitter. Its TX-enable line
+                      couldn't be reached from the OBC side of the interface, so the radio never
+                      keyed.
+                    </p>
+                  </section>
+                  <section>
+                    <h4>Diagnosis</h4>
+                    <p>
+                      I traced both boards' schematics pin by pin across the interface to find
+                      where the OBC's pinout and the transmitter's pinout disagreed.
+                    </p>
+                  </section>
+                  <section>
+                    <h4>Fix</h4>
+                    <p>
+                      I built a custom remapping harness that routes the OBC's signal to the
+                      transmitter's TX-enable pin. With the harness in place, the link worked.
+                    </p>
+                  </section>
+                </div>
+
+                <!--
+                  TODO (Andrew): add detail and uncomment. What first made you suspect the
+                  pinout rather than firmware or RF? What did you measure, and with what? Which
+                  connector and pins? What did you tell the board owners so the next revision
+                  is fixed?
+
+                <div class="figures">
+                  <figure>
+                    <img src="assets/theia/remap-harness.jpg" alt="The remapping harness between the OBC and S-band transmitter" loading="lazy" />
+                    <figcaption>The remapping harness.</figcaption>
+                  </figure>
+                  <figure>
+                    <img src="assets/theia/ground-station.jpg" alt="The 915 MHz ground station transceiver" loading="lazy" />
+                    <figcaption>915 MHz ground station transceiver, two RFM9x LoRa modules.</figcaption>
+                  </figure>
+                </div>
+                -->
+              </div>
+            </details>
           </article>
 
           <article class="project" data-reveal>
-            <h3>Haptic Glove</h3>
+            <h3>Wearable Sensor Glove</h3>
             <p>
-              A wearable motion-tracking glove that captures finger articulation and hand movement
-              using Hall effect sensors, potentiometers, and accelerometers.
+              A wearable glove with an array of analog flex sensors and IMUs that captures
+              high-frequency ground-truth hand kinematics for validating ML pose estimates. I wrote
+              the real-time ADC acquisition, sensor calibration, and voltage-to-joint-angle mapping,
+              plus low-latency ROS 2 nodes in C++ and Python that stream the synchronized sensor
+              data.
             </p>
             <ul class="tags">
-              <li>Sensors</li>
-              <li>Kinematics</li>
-              <li>Embedded</li>
+              <li>ROS 2</li>
+              <li>C++</li>
+              <li>Python</li>
+              <li>Analog sensing</li>
             </ul>
+            <!--
+              TODO (Andrew): add a photo and uncomment.
+            <figure class="project__figure">
+              <img src="assets/glove/glove.jpg" alt="The sensor glove" loading="lazy" />
+              <figcaption>Flex sensors along each finger, IMUs on the back of the hand.</figcaption>
+            </figure>
+            -->
           </article>
         </div>
       </section>
@@ -223,40 +490,53 @@
               <li>C</li>
               <li>C++</li>
               <li>Python</li>
-              <li>x86-64 Assembly</li>
-              <li>Java</li>
               <li>MATLAB</li>
+              <li>SystemVerilog</li>
+              <li>Assembly</li>
+            </ul>
+          </div>
+          <div class="skills__group" data-reveal>
+            <h3>Protocols &amp; RF</h3>
+            <ul>
+              <li>SPI, I2C, UART</li>
+              <li>RS-422/485, CAN</li>
+              <li>LoRa</li>
+              <li>CCSDS</li>
+              <li>RF link budgets</li>
             </ul>
           </div>
           <div class="skills__group" data-reveal>
             <h3>Hardware</h3>
             <ul>
-              <li>Custom PCB design</li>
-              <li>Bare-metal firmware</li>
-              <li>Computer architecture</li>
-              <li>MOSFET half-bridges</li>
-              <li>ESC design</li>
+              <li>4-layer PCB design (KiCad)</li>
+              <li>STM32</li>
+              <li>Power electronics (MOSFETs, buck/LDO)</li>
+              <li>Op-amps</li>
+              <li>Wire harnessing</li>
+              <li>AIT</li>
             </ul>
           </div>
           <div class="skills__group" data-reveal>
-            <h3>Tools</h3>
+            <h3>Test &amp; tools</h3>
             <ul>
-              <li>Git</li>
-              <li>Fusion 360</li>
+              <li>Oscilloscopes</li>
+              <li>Logic analyzers</li>
+              <li>Multimeters</li>
+              <li>Linux, Git, Docker</li>
+              <li>ROS 2</li>
               <li>SolidWorks</li>
-              <li>Onshape</li>
-              <li>VS Code</li>
-              <li>Eclipse</li>
+              <li>Jira, Confluence</li>
             </ul>
           </div>
           <div class="skills__group" data-reveal>
-            <h3>Spoken</h3>
+            <h3>Spoken &amp; licenses</h3>
             <ul>
               <li>English — native</li>
               <li>Russian — native</li>
-              <li>Spanish — intermediate</li>
-              <li>French — intermediate</li>
-              <li>Mandarin — beginner</li>
+              <li>Mandarin Chinese — conversational</li>
+              <li>French — conversational</li>
+              <li>Spanish — conversational</li>
+              <li>FCC Technician Class amateur radio license</li>
             </ul>
           </div>
         </div>
