@@ -98,6 +98,45 @@ const onScroll = () => {
 window.addEventListener("scroll", onScroll, { passive: true });
 onScroll();
 
+/* PCB viewer --------------------------------------------------------------- */
+
+// model-viewer (and the three.js it bundles) is large, so it is only fetched
+// once the viewer is close to scrolling into view.
+const pcbViewer = document.querySelector("[data-pcb-viewer]");
+
+if (pcbViewer) {
+  const model = pcbViewer.querySelector("model-viewer");
+  const status = pcbViewer.querySelector("[data-pcb-status]");
+
+  if (reducedMotion) model.removeAttribute("auto-rotate");
+
+  model.addEventListener("load", () => {
+    if (status) status.hidden = true;
+  });
+  model.addEventListener("error", () => {
+    if (status) status.textContent = "The 3D model couldn't load.";
+  });
+
+  const loadViewer = () =>
+    import("@google/model-viewer").catch(() => {
+      if (status) status.textContent = "The 3D viewer couldn't load.";
+    });
+
+  if ("IntersectionObserver" in window) {
+    const viewerObserver = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        viewerObserver.disconnect();
+        loadViewer();
+      },
+      { rootMargin: "400px 0px" }
+    );
+    viewerObserver.observe(pcbViewer);
+  } else {
+    loadViewer();
+  }
+}
+
 /* Footer year -------------------------------------------------------------- */
 
 const year = document.querySelector("[data-year]");
