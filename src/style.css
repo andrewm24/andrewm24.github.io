@@ -48,6 +48,8 @@ html {
 
 body {
   margin: 0;
+  /* The hero orbit is wider than the photo; never let it widen the page. */
+  overflow-x: clip;
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
@@ -187,11 +189,51 @@ ol {
   max-width: var(--page);
   margin: 0 auto;
   padding: clamp(4rem, 13vw, 8rem) var(--pad) clamp(3rem, 8vw, 5rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "head head"
+    "body photo";
+  align-items: center;
+  column-gap: clamp(2rem, 6vw, 4rem);
+}
+
+.hero__head {
+  grid-area: head;
+  position: relative;
+  z-index: 2;
 }
 
 .hero__content {
+  grid-area: body;
   position: relative;
   z-index: 1;
+  min-width: 0;
+}
+
+.hero__content .hero__links {
+  margin-top: 2.25rem;
+}
+
+/* Portrait, with the one nod to where this site came from: a quiet orbit. */
+.portrait {
+  --size: clamp(10rem, 22vw, 13rem);
+  grid-area: photo;
+  position: relative;
+  width: var(--size);
+  aspect-ratio: 1;
+}
+
+.portrait__photo {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--rule);
 }
 
 .kicker {
@@ -204,7 +246,7 @@ ol {
 }
 
 h1 {
-  font-size: clamp(2.75rem, 9vw, 4.25rem);
+  font-size: clamp(2.25rem, 9.5vw, 4.25rem);
   margin-bottom: 1.5rem;
 }
 
@@ -236,15 +278,16 @@ h1 {
   border-bottom-color: var(--accent);
 }
 
-/* The one nod to where this site came from: a quiet orbit. */
 .orbit {
   position: absolute;
-  top: clamp(0rem, 3vw, 2rem);
-  right: clamp(-9rem, -7vw, -2.5rem);
-  width: min(28rem, 58vw);
+  top: 50%;
+  left: 50%;
+  /* viewBox is 400 wide, the photo spans 220 of it. */
+  width: calc(var(--size) * 400 / 220);
   height: auto;
+  transform: translate(-50%, -50%);
   pointer-events: none;
-  opacity: 0.5;
+  overflow: visible;
 }
 
 .orbit__path {
@@ -254,7 +297,7 @@ h1 {
 
 .orbit__dot {
   fill: var(--accent);
-  offset-path: path("M 10,120 A 190,100 0 1,1 390,120 A 190,100 0 1,1 10,120");
+  offset-path: path("M 10,200 A 190,120 0 1,1 390,200 A 190,120 0 1,1 10,200");
   offset-rotate: 0deg;
   animation: orbit 34s linear infinite;
 }
@@ -356,18 +399,53 @@ h1 {
   margin-top: 0.35rem;
 }
 
+.entry__points {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+  color: var(--muted);
+}
+
+.entry__points li {
+  position: relative;
+  padding-left: 1.1rem;
+}
+
+.entry__points li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.78em;
+  width: 0.45rem;
+  height: 1px;
+  background: var(--accent);
+}
+
+.entry__points a,
+.deep-dive a {
+  color: var(--text);
+  text-decoration-color: var(--rule);
+  text-underline-offset: 0.2em;
+}
+
+.entry__points a:hover {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+}
+
 /* ---------------------------------------------------------------------------
    Projects
    --------------------------------------------------------------------------- */
 
 .projects {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 1.25rem;
-  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
 }
 
 .project {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.75rem;
   align-content: start;
   padding: 1.6rem;
@@ -385,69 +463,16 @@ h1 {
   font-size: 0.9375rem;
 }
 
-/* Featured project with the interactive PCB model. */
-.project--feature {
-  grid-column: 1 / -1;
-  padding: 0;
-  overflow: hidden;
-  gap: 0;
-}
-
-.project__body {
-  display: grid;
-  gap: 0.75rem;
-  padding: 1.6rem;
-}
-
-.pcb-viewer {
-  margin: 0;
-  position: relative;
-  border-bottom: 1px solid var(--rule);
-  background:
-    radial-gradient(ellipse at 50% 40%, var(--surface) 0%, transparent 70%),
-    var(--bg);
-}
-
-.pcb-viewer model-viewer {
-  display: block;
-  width: 100%;
-  height: clamp(16rem, 52vw, 24rem);
-  background: transparent;
-  --poster-color: transparent;
-}
-
-.pcb-viewer model-viewer:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: -2px;
-}
-
-.pcb-viewer__status {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
-  color: var(--muted);
-  pointer-events: none;
-  transition: opacity 300ms ease;
-}
-
-.pcb-viewer__status[hidden] {
-  display: grid;
-  opacity: 0;
-}
-
-.pcb-viewer figcaption {
-  position: absolute;
-  left: 1rem;
-  bottom: 0.75rem;
+.project__status {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
-  letter-spacing: 0.03em;
-  color: var(--muted);
-  pointer-events: none;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.project > .project__status + h3 {
+  margin-top: -0.4rem;
 }
 
 .tags {
@@ -465,6 +490,202 @@ h1 {
   border: 1px solid var(--rule);
   border-radius: 999px;
   padding: 0.2rem 0.6rem;
+}
+
+/* Expandable design notes ------------------------------------------------- */
+
+.deep-dive {
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--rule);
+  padding-top: 1rem;
+}
+
+.deep-dive summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.deep-dive summary::-webkit-details-marker {
+  display: none;
+}
+
+.deep-dive summary::before {
+  content: "+";
+  display: inline-grid;
+  place-items: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+  color: var(--accent);
+  font-size: 0.875rem;
+  line-height: 1;
+  transition: border-color 160ms ease;
+}
+
+.deep-dive[open] summary::before {
+  content: "−";
+}
+
+.deep-dive summary:hover::before {
+  border-color: var(--accent);
+}
+
+.deep-dive__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.75rem;
+  padding-top: 1.5rem;
+}
+
+.deep-dive__grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+
+.deep-dive h4 {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text);
+  margin: 0 0 0.5rem;
+}
+
+/* Figures and the block diagram */
+
+figure {
+  margin: 0;
+}
+
+figcaption {
+  margin-top: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+}
+
+.diagram__scroll {
+  overflow-x: auto;
+  padding: 1rem;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: 0.5rem;
+}
+
+.diagram svg {
+  display: block;
+  width: 100%;
+  min-width: 34rem;
+  height: auto;
+}
+
+.bd-group {
+  fill: none;
+  stroke: var(--rule);
+  stroke-dasharray: 4 4;
+}
+
+.bd-group-label,
+.bd-label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  fill: var(--muted);
+}
+
+.bd-label {
+  text-anchor: middle;
+}
+
+.bd-label--start {
+  text-anchor: start;
+}
+
+.bd-box {
+  fill: var(--surface);
+  stroke: var(--muted);
+  stroke-width: 1;
+}
+
+.bd-box--key {
+  stroke: var(--accent);
+}
+
+.bd-text {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  fill: var(--text);
+  text-anchor: middle;
+}
+
+.bd-text--sub {
+  font-size: 11px;
+  fill: var(--muted);
+}
+
+.bd-line {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.25;
+}
+
+.bd-line--power {
+  stroke: var(--accent);
+  stroke-dasharray: 5 4;
+}
+
+.bd-head {
+  fill: var(--muted);
+}
+
+/* Photo grid, for board renders, hardware photos, and scope captures. */
+.figures {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+}
+
+.figures img,
+.project__figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  border: 1px solid var(--rule);
+  background: var(--bg);
+}
+
+.stackup {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+}
+
+.stackup th,
+.stackup td {
+  text-align: left;
+  padding: 0.45rem 0.75rem 0.45rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.stackup th {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  color: var(--accent);
+  width: 3rem;
 }
 
 /* ---------------------------------------------------------------------------
@@ -613,8 +834,19 @@ html.js [data-reveal].is-visible {
     gap: 0.2rem;
   }
 
-  .orbit {
-    opacity: 0.28;
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "photo"
+      "head"
+      "body";
+    padding-top: clamp(3rem, 10vw, 4rem);
+  }
+
+  .portrait {
+    --size: 8.5rem;
+    justify-self: center;
+    margin-block: 1.5rem 2.5rem;
   }
 }
 
