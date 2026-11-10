@@ -21,5 +21,8 @@
   "homepage": "https://github.com/andrewm24/Personal-Website#readme",
   "devDependencies": {
     "vite": "^8.0.8"
+  },
+  "dependencies": {
+    "@google/model-viewer": "4.4.0"
   }
 }

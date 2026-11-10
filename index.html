@@ -183,6 +183,44 @@
       <section class="section" id="projects">
         <h2 class="section__title" data-reveal>Projects</h2>
         <div class="projects">
+          <article class="project project--feature" data-reveal>
+            <figure class="pcb-viewer" data-pcb-viewer>
+              <model-viewer
+                src="assets/models/esc-pcb.glb"
+                alt="3D model of my drone ESC circuit board, exported from KiCad"
+                camera-controls
+                auto-rotate
+                auto-rotate-delay="1500"
+                rotation-per-second="18deg"
+                interaction-prompt="none"
+                camera-orbit="30deg 55deg auto"
+                field-of-view="24deg"
+                shadow-intensity="0.6"
+                exposure="1.05"
+                environment-image="neutral"
+                loading="lazy"
+                touch-action="pan-y"
+              >
+                <div class="pcb-viewer__status" slot="progress-bar" data-pcb-status>Loading 3D model…</div>
+              </model-viewer>
+              <figcaption>Drag to rotate · scroll or pinch to zoom</figcaption>
+            </figure>
+            <div class="project__body">
+              <h3>Drone ESC</h3>
+              <p>
+                A 3-phase brushless ESC for my quadcopter, using half-bridge N-channel MOSFET stages
+                and gate drivers, with high-current polygon pours laid out to minimize switching-loop
+                parasitic inductance. The model is the board straight out of KiCad.
+              </p>
+              <ul class="tags">
+                <li>KiCad</li>
+                <li>Power electronics</li>
+                <li>MOSFET half-bridges</li>
+                <li>Gate drivers</li>
+              </ul>
+            </div>
+          </article>
+
           <article class="project" data-reveal>
             <h3>Quadcopter Flight Computer</h3>
             <p>
