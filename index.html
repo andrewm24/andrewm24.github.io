@@ -248,6 +248,30 @@
               <li>Power electronics</li>
             </ul>
 
+            <figure class="pcb-viewer" data-pcb-viewer>
+              <div class="pcb-viewer__stage">
+                <model-viewer
+                  src="assets/models/esc-pcb.glb"
+                  alt="3D model of the ESC circuit board, exported from KiCad"
+                  camera-controls
+                  auto-rotate
+                  auto-rotate-delay="1500"
+                  rotation-per-second="18deg"
+                  interaction-prompt="none"
+                  camera-orbit="30deg 55deg auto"
+                  field-of-view="24deg"
+                  shadow-intensity="0.6"
+                  exposure="1.05"
+                  environment-image="neutral"
+                  loading="lazy"
+                  touch-action="pan-y"
+                >
+                  <div class="pcb-viewer__status" slot="progress-bar" data-pcb-status>Loading 3D model…</div>
+                </model-viewer>
+              </div>
+              <figcaption>The ESC board, 3D model from KiCad. Drag to rotate, scroll or pinch to zoom.</figcaption>
+            </figure>
+
             <details class="deep-dive">
               <summary>Design notes</summary>
               <div class="deep-dive__body">

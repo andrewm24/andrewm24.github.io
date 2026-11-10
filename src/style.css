@@ -492,6 +492,53 @@ h1 {
   padding: 0.2rem 0.6rem;
 }
 
+/* Interactive PCB model --------------------------------------------------- */
+
+.pcb-viewer {
+  margin-top: 0.5rem;
+}
+
+.pcb-viewer__stage {
+  position: relative;
+  border: 1px solid var(--rule);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 40%, var(--surface) 0%, transparent 70%),
+    var(--bg);
+}
+
+.pcb-viewer model-viewer {
+  display: block;
+  width: 100%;
+  height: clamp(16rem, 52vw, 24rem);
+  background: transparent;
+  --poster-color: transparent;
+}
+
+.pcb-viewer model-viewer:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.pcb-viewer__status {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  pointer-events: none;
+  transition: opacity 300ms ease;
+}
+
+.pcb-viewer__status[hidden] {
+  display: grid;
+  opacity: 0;
+}
+
 /* Expandable design notes ------------------------------------------------- */
 
 .deep-dive {
