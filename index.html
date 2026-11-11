@@ -493,7 +493,80 @@
               <li>C++</li>
               <li>Python</li>
               <li>Analog sensing</li>
+              <li>ESP32-S3</li>
+              <li>Flex PCB</li>
             </ul>
+
+            <details class="deep-dive">
+              <summary>The boards</summary>
+              <div class="deep-dive__body">
+                <p>
+                  The glove runs on two kinds of board: a rigid hub on the back of the hand that
+                  does all the processing, power and communication, and five flexible strips that
+                  bend with the fingers and carry the sensors.
+                </p>
+
+                <figure class="project__figure">
+                  <img
+                    src="assets/glove/wrist-hub.webp"
+                    alt="KiCad layout of the wrist hub: five finger connectors along the top edge, the ESP32-S3 module on the right, and USB-C and power circuitry on the lower left"
+                    width="1562"
+                    height="1208"
+                    loading="lazy"
+                  />
+                  <figcaption>Wrist hub. One connector per finger along the top, the ESP32-S3 on the right, power on the lower left.</figcaption>
+                </figure>
+
+                <figure class="project__figure">
+                  <img
+                    src="assets/glove/finger-strip.webp"
+                    alt="KiCad layout of a finger strip: the connector tail on the left, Hall sensors at the MCP and PIP joints, and fingertip force sensor pads on the right"
+                    width="1903"
+                    height="201"
+                    loading="lazy"
+                  />
+                  <figcaption>Finger strip. Connector tail on the left, Hall sensors at the MCP and PIP joints, force sensor pads at the tip.</figcaption>
+                </figure>
+
+                <div class="deep-dive__grid">
+                  <section>
+                    <h4>Wrist hub</h4>
+                    <p>
+                      A 4-layer, 72 × 55.5 mm board. An ESP32-S3 handles Wi-Fi, BLE and USB. Four
+                      12-bit MCP3208 ADCs read 27 sensor channels, each through its own RC filter,
+                      and an LSM6DSOX IMU tracks the hand itself.
+                    </p>
+                  </section>
+                  <section>
+                    <h4>Power</h4>
+                    <p>
+                      USB-C charges a LiPo, and a P-FET power path switches to the battery when USB
+                      is unplugged. Analog and digital get separate 3.3 V regulators, with a ferrite
+                      bead keeping radio noise off the sensors. The ADCs take their reference from
+                      the analog rail, so every reading is ratiometric to the sensor supply.
+                    </p>
+                  </section>
+                  <section>
+                    <h4>Finger strips</h4>
+                    <p>
+                      One flex design built five times: 128 mm long and about 0.11 mm thick. Hall
+                      sensors at the MCP and PIP knuckles read a small magnet on the next bone, and
+                      pads take two tendon potentiometers and a fingertip force sensor. Each strip
+                      is a simple, replaceable sensor carrier that plugs into the hub.
+                    </p>
+                  </section>
+                  <section>
+                    <h4>Built to bend</h4>
+                    <p>
+                      No vias in the bend zones and straight traces through them, so flexing
+                      doesn't crack anything. A mesh ground pour shields the signals without
+                      stiffening the strip, and the tail pinout is mirrored so a strip plugged in
+                      upside down can't short a supply.
+                    </p>
+                  </section>
+                </div>
+              </div>
+            </details>
             <!--
               TODO (Andrew): add a photo and uncomment.
             <figure class="project__figure">
